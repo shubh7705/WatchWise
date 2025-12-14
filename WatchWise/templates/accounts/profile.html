@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile</title>
+</head>
+<body>
+
+<h2>Profile</h2>
+
+<p><strong>Username:</strong> {{ user.username }}</p>
+<p><strong>Email:</strong> {{ user.email }}</p>
+<p><strong>Joined on:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+
+<hr>
+
+<h3>Profile Details</h3>
+
+{% if profile.bio %}
+    <p><strong>Bio:</strong> {{ profile.bio }}</p>
+{% else %}
+    <p><em>No bio added yet.</em></p>
+{% endif %}
+
+{% if profile.profile_image %}
+    <img src="{{ profile.profile_image.url }}" alt="Profile Image" width="150">
+{% endif %}
+
+<hr>
+
+<p>
+    <a href="{% url 'login' %}">Logout</a>
+</p>
+
+</body>
+</html>
