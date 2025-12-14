@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movies</title>
+</head>
+<body>
+
+<h2>Movies</h2>
+
+<!-- Search Form -->
+<form method="get">
+    <input type="text" name="q" placeholder="Search movies..." value="{{ query|default:'' }}">
+    <button type="submit">Search</button>
+</form>
+
+<!-- Genre Filter -->
+<form method="get">
+    <label>Filter by Genre:</label>
+    <select name="genre" onchange="this.form.submit()">
+        <option value="">All</option>
+        {% for genre in genres %}
+            <option value="{{ genre.id }}" {% if selected_genre == genre.id|stringformat:"s" %}selected{% endif %}>
+                {{ genre.name }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
+<hr>
+
+{% if user.is_authenticated %}
+    <p><a href="{% url 'movies:add' %}">Add New Movie</a></p>
+{% endif %}
+
+<!-- Movies List -->
+<ul>
+    {% for movie in movies %}
+        <li>
+            <a href="{% url 'movies:detail' movie.id %}">{{ movie.title }}</a>
+            {% if movie.release_year %} ({{ movie.release_year }}){% endif %}
+        </li>
+    {% empty %}
+        <li>No movies found.</li>
+    {% endfor %}
+</ul>
+
+</body>
+</html>

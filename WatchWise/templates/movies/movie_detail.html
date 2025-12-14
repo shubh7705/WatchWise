@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ movie.title }} - Movie Details</title>
+</head>
+<body>
+
+<h2>{{ movie.title }}</h2>
+
+{% if movie.poster %}
+    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" width="200">
+{% endif %}
+
+<p><strong>Description:</strong> {{ movie.description }}</p>
+<p><strong>Release Year:</strong> {{ movie.release_year }}</p>
+<p><strong>Language:</strong> {{ movie.language }}</p>
+<p><strong>Duration:</strong> {{ movie.duration_minutes }} minutes</p>
+
+<p><strong>Genres:</strong>
+    {% for genre in movie.genres.all %}
+        {{ genre.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+
+<hr>
+
+{% if user.is_authenticated %}
+    {% comment %} <form action="{% url 'accounts:add_to_watch_history' movie.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Add to Watch History</button>
+    </form> {% endcomment %}
+{% else %}
+    <p><a href="{% url 'login' %}">Login</a> to add this movie to your watch history.</p>
+{% endif %}
+
+<p><a href="{% url 'movies:list' %}">Back to Movie List</a></p>
+
+</body>
+</html>

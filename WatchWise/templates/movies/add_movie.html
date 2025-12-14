@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Movie</title>
+</head>
+<body>
+
+<h2>Add Movie</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <p>
+        <label>Title *</label><br>
+        <input type="text" name="title" required>
+    </p>
+
+    <p>
+        <label>Description</label><br>
+        <textarea name="description"></textarea>
+    </p>
+
+    <p>
+        <label>Release Year *</label><br>
+        <input type="number" name="release_year" required>
+    </p>
+
+    <p>
+        <label>Language</label><br>
+        <input type="text" name="language">
+    </p>
+
+    <p>
+        <label>Duration (minutes) *</label><br>
+        <input type="number" name="duration" required>
+    </p>
+
+    <p>
+        <label>Genres</label><br>
+        {% for genre in genres %}
+            <input type="checkbox" name="genres" value="{{ genre.id }}">
+            {{ genre.name }} <br>
+        {% endfor %}
+    </p>
+
+    <p>
+        <label>Poster</label><br>
+        <input type="file" name="poster">
+    </p>
+
+    <button type="submit">Add Movie</button>
+</form>
+
+</body>
+</html>
