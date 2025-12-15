@@ -1,48 +1,103 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Movies</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>Movies</h2>
+{% block title %}Movies | WatchWise{% endblock %}
 
-<!-- Search Form -->
-<form method="get">
-    <input type="text" name="q" placeholder="Search movies..." value="{{ query|default:'' }}">
-    <button type="submit">Search</button>
-</form>
+{% block extra_css %}
+<style>
+  /* ================= PAGE ================= */
+  .container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 0 20px;
+  }
 
-<!-- Genre Filter -->
-<form method="get">
-    <label>Filter by Genre:</label>
-    <select name="genre" onchange="this.form.submit()">
-        <option value="">All</option>
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  /* Search & Filter */
+  .filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+  }
+
+  input, select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  /* Movie List */
+  .movie-list {
+    list-style: none;
+    margin-top: 20px;
+  }
+
+  .movie-list li {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+    transition: 0.3s ease;
+  }
+
+  .movie-list li:hover {
+    transform: translateY(-2px);
+  }
+
+  .movie-list a {
+    text-decoration: none;
+    font-weight: 600;
+    color: #000;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <h2>Movies</h2>
+
+  <!-- Search & Filter -->
+  <div class="filters">
+    <form method="get">
+      <input type="text"
+             name="q"
+             placeholder="Search movies..."
+             value="{{ query|default:'' }}">
+    </form>
+
+    <form method="get">
+      <select name="genre" onchange="this.form.submit()">
+        <option value="">All Genres</option>
         {% for genre in genres %}
-            <option value="{{ genre.id }}" {% if selected_genre == genre.id|stringformat:"s" %}selected{% endif %}>
-                {{ genre.name }}
-            </option>
+          <option value="{{ genre.id }}"
+            {% if selected_genre == genre.id|stringformat:"s" %}selected{% endif %}>
+            {{ genre.name }}
+          </option>
         {% endfor %}
-    </select>
-</form>
+      </select>
+    </form>
+  </div>
 
-<hr>
-
-{% if user.is_authenticated %}
-    <p><a href="{% url 'movies:add' %}">Add New Movie</a></p>
-{% endif %}
-
-<!-- Movies List -->
-<ul>
+  <!-- Movies List -->
+  <ul class="movie-list">
     {% for movie in movies %}
-        <li>
-            <a href="{% url 'movies:detail' movie.id %}">{{ movie.title }}</a>
-            {% if movie.release_year %} ({{ movie.release_year }}){% endif %}
-        </li>
+      <li>
+        <a href="{% url 'movies:detail' movie.id %}">
+          {{ movie.title }}
+        </a>
+        {% if movie.release_year %}
+          ({{ movie.release_year }})
+        {% endif %}
+      </li>
     {% empty %}
-        <li>No movies found.</li>
+      <li>No movies found.</li>
     {% endfor %}
-</ul>
+  </ul>
 
-</body>
-</html>
+</div>
+{% endblock %}

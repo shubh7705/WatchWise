@@ -1,0 +1,148 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>{% block title %}WatchWise{% endblock %}</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+
+      body {
+        background-color: #f6f0e6;
+        color: #000;
+      }
+
+      /* ================= NAVBAR ================= */
+      .navbar {
+        height: 70px;
+        background-color: #f6f0e6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .brand-name {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 30px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: #000;
+        font-weight: 500;
+        position: relative;
+      }
+
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -5px;
+        width: 0%;
+        height: 2px;
+        background-color: #000;
+        transition: 0.3s ease;
+      }
+
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .btn {
+        padding: 8px 18px;
+        background-color: #000;
+        color: #f6f0e6;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .nav-user {
+        font-weight: 600;
+      }
+
+      /* ================= PAGE CONTENT ================= */
+      .container {
+        max-width: 1000px;
+        margin: 50px auto;
+        padding: 0 20px;
+      }
+
+      .nav-user {
+  text-decoration: none;
+  color: #000;
+  font-weight: 600;
+}
+
+.nav-user:hover {
+  text-decoration: underline;
+}
+
+    </style>
+
+    {% block extra_css %}{% endblock %}
+  </head>
+
+  <body>
+
+    <!-- ================= NAVBAR ================= -->
+    <nav class="navbar">
+      <span class="brand-name">WatchWise</span>
+
+      <ul class="nav-links">
+        <li><a href="{% url 'movies:list' %}">Movies</a></li>
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'movies:add' %}">Add Movie</a></li>
+        {% endif %}
+      </ul>
+
+      <div class="nav-right">
+  {% if user.is_authenticated %}
+    <a href="{% url 'accounts:profile' %}" class="nav-user">
+      Hi, {{ user.username }}
+    </a>
+
+    <form action="{% url 'logout' %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn">Logout</button>
+    </form>
+  {% else %}
+    <a href="{% url 'login' %}">
+      <button class="btn">Login</button>
+    </a>
+  {% endif %}
+</div>
+
+    </nav>
+
+    <!-- ================= CONTENT ================= -->
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+
+    {% block extra_js %}{% endblock %}
+
+  </body>
+  </html>

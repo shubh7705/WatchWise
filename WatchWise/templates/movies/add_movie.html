@@ -1,55 +1,127 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Movie</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>Add Movie</h2>
+{% block title %}Add Movie | WatchWise{% endblock %}
 
-<form method="post" enctype="multipart/form-data">
+{% block extra_css %}
+<style>
+  .add-movie-container {
+    max-width: 700px;
+    margin: 70px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
+
+  .add-movie-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  form p {
+    margin-bottom: 15px;
+  }
+
+  label {
+    font-weight: 600;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 5px;
+  }
+
+  .genres label {
+    font-weight: 400;
+  }
+
+  input[type="file"] {
+    margin-top: 5px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #000;
+    color: #f6f0e6;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="add-movie-container">
+
+  <h2>Add Movie</h2>
+
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
     <p>
-        <label>Title *</label><br>
-        <input type="text" name="title" required>
+      <label>Title *</label>
+      <input type="text" name="title" required>
     </p>
 
     <p>
-        <label>Description</label><br>
-        <textarea name="description"></textarea>
+      <label>Description</label>
+      <textarea name="description"></textarea>
     </p>
 
     <p>
-        <label>Release Year *</label><br>
-        <input type="number" name="release_year" required>
+      <label>Release Year *</label>
+      <input type="number" name="release_year" required>
     </p>
 
     <p>
-        <label>Language</label><br>
-        <input type="text" name="language">
+      <label>Language</label>
+      <input type="text" name="language">
     </p>
 
     <p>
-        <label>Duration (minutes) *</label><br>
-        <input type="number" name="duration" required>
+      <label>Duration (minutes) *</label>
+      <input type="number" name="duration" required>
     </p>
 
     <p>
-        <label>Genres</label><br>
+      <label>Genres</label>
+      <div class="genres">
         {% for genre in genres %}
+          <label>
             <input type="checkbox" name="genres" value="{{ genre.id }}">
-            {{ genre.name }} <br>
+            {{ genre.name }}
+          </label>
         {% endfor %}
+      </div>
     </p>
 
     <p>
-        <label>Poster</label><br>
-        <input type="file" name="poster">
+      <label>Poster</label>
+      <input type="file" name="poster">
     </p>
 
-    <button type="submit">Add Movie</button>
-</form>
+    <button type="submit" class="submit-btn">Add Movie</button>
+  </form>
 
-</body>
-</html>
+</div>
+{% endblock %}

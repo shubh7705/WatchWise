@@ -34,6 +34,7 @@ def movie_list_view(request):
 
     return render(request, "movies/movie_list.html", context)
 
+@login_required
 def movie_detail_view(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
 

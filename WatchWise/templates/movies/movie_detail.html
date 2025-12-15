@@ -1,39 +1,117 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ movie.title }} - Movie Details</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>{{ movie.title }}</h2>
+{% block title %}{{ movie.title }} | WatchWise{% endblock %}
 
-{% if movie.poster %}
-    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" width="200">
-{% endif %}
+{% block extra_css %}
+<style>
+  .movie-detail-container {
+    max-width: 900px;
+    margin: 70px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
 
-<p><strong>Description:</strong> {{ movie.description }}</p>
-<p><strong>Release Year:</strong> {{ movie.release_year }}</p>
-<p><strong>Language:</strong> {{ movie.language }}</p>
-<p><strong>Duration:</strong> {{ movie.duration_minutes }} minutes</p>
+  .movie-header {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
 
-<p><strong>Genres:</strong>
-    {% for genre in movie.genres.all %}
-        {{ genre.name }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}
-</p>
+  .movie-poster img {
+    width: 220px;
+    border-radius: 10px;
+  }
 
-<hr>
+  .movie-info h2 {
+    margin-bottom: 15px;
+  }
 
-{% if user.is_authenticated %}
-    {% comment %} <form action="{% url 'accounts:add_to_watch_history' movie.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Add to Watch History</button>
-    </form> {% endcomment %}
-{% else %}
-    <p><a href="{% url 'login' %}">Login</a> to add this movie to your watch history.</p>
-{% endif %}
+  .movie-info p {
+    margin-bottom: 10px;
+  }
 
-<p><a href="{% url 'movies:list' %}">Back to Movie List</a></p>
+  .genres {
+    margin-top: 10px;
+  }
 
-</body>
-</html>
+  .genre-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 4px 4px 0 0;
+    background-color: #000;
+    color: #f6f0e6;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  .movie-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .movie-actions a,
+  .movie-actions button {
+    padding: 8px 16px;
+    background-color: #000;
+    color: #f6f0e6;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .login-note {
+    margin-top: 15px;
+    font-style: italic;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="movie-detail-container">
+
+  <div class="movie-header">
+    {% if movie.poster %}
+      <div class="movie-poster">
+        <img src="{{ movie.poster.url }}" alt="{{ movie.title }}">
+      </div>
+    {% endif %}
+
+    <div class="movie-info">
+      <h2>{{ movie.title }}</h2>
+
+      <p><strong>Description:</strong> {{ movie.description }}</p>
+      <p><strong>Release Year:</strong> {{ movie.release_year }}</p>
+      <p><strong>Language:</strong> {{ movie.language }}</p>
+      <p><strong>Duration:</strong> {{ movie.duration_minutes }} minutes</p>
+
+      <div class="genres">
+        <strong>Genres:</strong><br>
+        {% for genre in movie.genres.all %}
+          <span class="genre-badge">{{ genre.name }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <hr style="margin:30px 0;">
+
+  {% if user.is_authenticated %}
+    {# Future: Add to watch history / reviews / ratings #}
+  {% else %}
+    <p class="login-note">
+      <a href="{% url 'login' %}">Login</a> to add this movie to your watch history.
+    </p>
+  {% endif %}
+
+  <div class="movie-actions">
+    <a href="{% url 'movies:list' %}">← Back to Movie List</a>
+  </div>
+
+</div>
+{% endblock %}

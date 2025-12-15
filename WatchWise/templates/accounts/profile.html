@@ -1,35 +1,98 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User Profile</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>Profile</h2>
+{% block title %}Profile | WatchWise{% endblock %}
 
-<p><strong>Username:</strong> {{ user.username }}</p>
-<p><strong>Email:</strong> {{ user.email }}</p>
-<p><strong>Joined on:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+{% block extra_css %}
+<style>
+  .profile-container {
+    max-width: 700px;
+    margin: 70px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
 
-<hr>
+  .profile-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+  }
 
-<h3>Profile Details</h3>
+  .profile-info p {
+    margin-bottom: 10px;
+  }
 
-{% if profile.bio %}
+  .profile-image {
+    margin-top: 15px;
+  }
+
+  .profile-image img {
+    width: 150px;
+    border-radius: 10px;
+  }
+
+  .profile-actions {
+    margin-top: 25px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .profile-actions a,
+  .profile-actions button {
+    padding: 8px 16px;
+    background-color: #000;
+    color: #f6f0e6;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .profile-actions button {
+    background-color: #333;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+
+  <h2>Profile</h2>
+
+  <div class="profile-info">
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Joined on:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+  </div>
+
+  <hr>
+
+  <h3>Profile Details</h3>
+
+  {% if profile.bio %}
     <p><strong>Bio:</strong> {{ profile.bio }}</p>
-{% else %}
+  {% else %}
     <p><em>No bio added yet.</em></p>
-{% endif %}
+  {% endif %}
 
-{% if profile.profile_image %}
-    <img src="{{ profile.profile_image.url }}" alt="Profile Image" width="150">
-{% endif %}
+  {% if profile.profile_image %}
+    <div class="profile-image">
+      <img src="{{ profile.profile_image.url }}" alt="Profile Image">
+    </div>
+  {% endif %}
 
-<hr>
+  <div class="profile-actions">
+    <form action="{% url 'logout' %}" method="post">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
 
-<p>
-    <a href="{% url 'login' %}">Logout</a>
-</p>
+    <a href="{% url 'movies:add' %}">Add Movie</a>
+    <a href="{% url 'movies:list' %}">Movie List</a>
+  </div>
 
-</body>
-</html>
+</div>
+{% endblock %}
+    
