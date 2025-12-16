@@ -52,10 +52,6 @@
     font-weight: 400;
   }
 
-  input[type="file"] {
-    margin-top: 5px;
-  }
-
   .submit-btn {
     width: 100%;
     padding: 12px;
@@ -67,6 +63,17 @@
     cursor: pointer;
     margin-top: 20px;
   }
+
+  .autofill-btn {
+    margin-top: 10px;
+    background: #f5c518;
+    color: #000;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+  }
 </style>
 {% endblock %}
 
@@ -75,32 +82,40 @@
 
   <h2>Add Movie</h2>
 
-  <form method="post" enctype="multipart/form-data">
+  <form method="post">
     {% csrf_token %}
 
     <p>
       <label>Title *</label>
-      <input type="text" name="title" required>
-    </p>
-
-    <p>
-      <label>Description</label>
-      <textarea name="description"></textarea>
+      <input type="text" id="title" name="title" required>
+      <button type="button" class="autofill-btn" onclick="autofillMovie()">
+        Auto-Fill with TMDB 🤖
+      </button>
     </p>
 
     <p>
       <label>Release Year *</label>
-      <input type="number" name="release_year" required>
+      <input type="number" id="release_year" name="release_year" required>
+    </p>
+
+    <p>
+      <label>Overview</label>
+      <textarea id="overview" name="overview"></textarea>
     </p>
 
     <p>
       <label>Language</label>
-      <input type="text" name="language">
+      <input type="text" id="language" name="language">
     </p>
 
     <p>
       <label>Duration (minutes) *</label>
-      <input type="number" name="duration" required>
+      <input type="number" id="duration" name="duration" required>
+    </p>
+
+    <p>
+      <label>Poster URL</label>
+      <input type="text" id="poster" name="poster">
     </p>
 
     <p>
@@ -115,13 +130,35 @@
       </div>
     </p>
 
-    <p>
-      <label>Poster</label>
-      <input type="file" name="poster">
-    </p>
-
     <button type="submit" class="submit-btn">Add Movie</button>
   </form>
 
 </div>
+
+<script>
+function autofillMovie() {
+  const title = document.getElementById("title").value;
+  const year = document.getElementById("release_year").value;
+
+  if (!title) {
+    alert("Please enter title to autofill.");
+    return;
+  }
+
+  fetch(`/movies/autofill/?title=${title}&year=${year}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+
+      document.getElementById("overview").value = data.overview || "";
+      document.getElementById("release_year").value = data.release_year || "";
+      document.getElementById("language").value = data.language || "";
+      document.getElementById("duration").value = data.runtime || "";
+      document.getElementById("poster").value = data.poster || "";
+    });
+}
+</script>
 {% endblock %}

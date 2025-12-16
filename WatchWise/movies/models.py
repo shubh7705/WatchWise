@@ -7,32 +7,45 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
 
+
 class Movie(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField()
-    
+    overview = models.TextField()
+
     release_year = models.PositiveIntegerField()
     language = models.CharField(max_length=50)
 
     genres = models.ManyToManyField(
         Genre,
-        related_name="movies"
+        related_name="movies",
+        blank=True
     )
 
-    poster = models.ImageField(
-        upload_to="movies/posters/",
-        blank=True,
-        null=True
-    )
+    poster = models.URLField(
+    blank=True,
+    null=True
+)
+
 
     duration_minutes = models.PositiveIntegerField(
-        help_text="Duration in minutes"
+        help_text="Duration in minutes",
+        null=True,
+        blank=True
+    )
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="movies"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ("title", "release_year")
+        ordering = ["-created_at"]
+
     def __str__(self):
-        return self.title
-
-
-
+        return f"{self.title} ({self.release_year})"

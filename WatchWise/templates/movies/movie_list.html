@@ -4,9 +4,8 @@
 
 {% block extra_css %}
 <style>
-  /* ================= PAGE ================= */
   .container {
-    max-width: 900px;
+    max-width: 1100px;
     margin: 50px auto;
     padding: 0 20px;
   }
@@ -15,43 +14,106 @@
     margin-bottom: 20px;
   }
 
-  /* Search & Filter */
   .filters {
     display: flex;
     gap: 15px;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
     flex-wrap: wrap;
   }
 
-  input, select {
-    padding: 10px;
-    border-radius: 6px;
+  .filters input,
+  .filters select {
+    padding: 10px 12px;
+    border-radius: 8px;
     border: 1px solid #ccc;
+    font-size: 14px;
   }
 
-  /* Movie List */
-  .movie-list {
-    list-style: none;
-    margin-top: 20px;
+  .movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
   }
 
-  .movie-list li {
-    background-color: #fff;
-    padding: 15px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+  .movie-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     transition: 0.3s ease;
   }
 
-  .movie-list li:hover {
-    transform: translateY(-2px);
+  .movie-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.12);
   }
 
-  .movie-list a {
+  .movie-card a {
     text-decoration: none;
+    color: inherit;
+  }
+
+  .movie-poster {
+    width: 100%;
+    height: 300px;
+    background: #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .movie-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .movie-content {
+    padding: 15px;
+  }
+
+  .movie-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .movie-year {
+    font-size: 14px;
+    color: #777;
+  }
+
+  .empty {
+    margin-top: 40px;
+    text-align: center;
+    padding: 40px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
+
+  .empty p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 20px;
+  }
+
+  .add-movie-btn {
+    display: inline-block;
+    padding: 12px 22px;
+    background: #4f46e5;
+    color: #fff;
+    border-radius: 10px;
     font-weight: 600;
-    color: #000;
+    text-decoration: none;
+    transition: 0.3s ease;
+  }
+
+  .add-movie-btn:hover {
+    background: #4338ca;
+    transform: translateY(-2px);
   }
 </style>
 {% endblock %}
@@ -61,13 +123,15 @@
 
   <h2>Movies</h2>
 
-  <!-- Search & Filter -->
+  <!-- ================= FILTERS ================= -->
   <div class="filters">
     <form method="get">
-      <input type="text"
-             name="q"
-             placeholder="Search movies..."
-             value="{{ query|default:'' }}">
+      <input
+        type="text"
+        name="q"
+        placeholder="Search movies..."
+        value="{{ query|default:'' }}"
+      />
     </form>
 
     <form method="get">
@@ -83,21 +147,43 @@
     </form>
   </div>
 
-  <!-- Movies List -->
-  <ul class="movie-list">
+  <!-- ================= MOVIE CARDS ================= -->
+  <div class="movie-grid">
     {% for movie in movies %}
-      <li>
+      <div class="movie-card">
         <a href="{% url 'movies:detail' movie.id %}">
-          {{ movie.title }}
+
+          <div class="movie-poster">
+            {% if movie.poster %}
+              <img src="{{ movie.poster }}" alt="{{ movie.title }}">
+            {% else %}
+              No Poster
+            {% endif %}
+          </div>
+
+          <div class="movie-content">
+            <div class="movie-title">{{ movie.title }}</div>
+            {% if movie.release_year %}
+              <div class="movie-year">{{ movie.release_year }}</div>
+            {% endif %}
+          </div>
+
         </a>
-        {% if movie.release_year %}
-          ({{ movie.release_year }})
-        {% endif %}
-      </li>
+      </div>
     {% empty %}
-      <li>No movies found.</li>
+      <div class="empty">
+        <p>
+          No movies found{% if query %} for "<strong>{{ query }}</strong>"{% endif %}.
+        </p>
+
+        {% if query %}
+          <a href="{% url 'movies:add' %}?title={{ query }}" class="add-movie-btn">
+            + Add "{{ query }}" as a new movie
+          </a>
+        {% endif %}
+      </div>
     {% endfor %}
-  </ul>
+  </div>
 
 </div>
 {% endblock %}

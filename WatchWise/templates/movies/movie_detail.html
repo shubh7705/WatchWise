@@ -53,16 +53,13 @@
     flex-wrap: wrap;
   }
 
-  .movie-actions a,
-  .movie-actions button {
+  .movie-actions a {
     padding: 8px 16px;
     background-color: #000;
     color: #f6f0e6;
-    border: none;
     border-radius: 6px;
     font-weight: 600;
     text-decoration: none;
-    cursor: pointer;
   }
 
   .login-note {
@@ -78,22 +75,33 @@
   <div class="movie-header">
     {% if movie.poster %}
       <div class="movie-poster">
-        <img src="{{ movie.poster.url }}" alt="{{ movie.title }}">
+        <img src="{{ movie.poster }}" alt="{{ movie.title }}">
       </div>
     {% endif %}
 
     <div class="movie-info">
       <h2>{{ movie.title }}</h2>
 
-      <p><strong>Description:</strong> {{ movie.description }}</p>
+      {% if movie.overview %}
+        <p><strong>Overview:</strong> {{ movie.overview }}</p>
+      {% endif %}
+
       <p><strong>Release Year:</strong> {{ movie.release_year }}</p>
-      <p><strong>Language:</strong> {{ movie.language }}</p>
-      <p><strong>Duration:</strong> {{ movie.duration_minutes }} minutes</p>
+
+      {% if movie.language %}
+        <p><strong>Language:</strong> {{ movie.language }}</p>
+      {% endif %}
+
+      {% if movie.duration_minutes %}
+        <p><strong>Duration:</strong> {{ movie.duration_minutes }} minutes</p>
+      {% endif %}
 
       <div class="genres">
         <strong>Genres:</strong><br>
         {% for genre in movie.genres.all %}
           <span class="genre-badge">{{ genre.name }}</span>
+        {% empty %}
+          <span>No genres specified</span>
         {% endfor %}
       </div>
     </div>
@@ -101,9 +109,7 @@
 
   <hr style="margin:30px 0;">
 
-  {% if user.is_authenticated %}
-    {# Future: Add to watch history / reviews / ratings #}
-  {% else %}
+  {% if not user.is_authenticated %}
     <p class="login-note">
       <a href="{% url 'login' %}">Login</a> to add this movie to your watch history.
     </p>

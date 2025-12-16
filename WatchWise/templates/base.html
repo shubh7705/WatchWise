@@ -19,6 +19,9 @@
 
       /* ================= NAVBAR ================= */
       .navbar {
+        position: sticky;
+  top: 0;
+  z-index: 1000;
         height: 70px;
         background-color: #f6f0e6;
         display: flex;
@@ -26,6 +29,7 @@
         justify-content: space-between;
         padding: 0 40px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        z-index: 1000; 
       }
 
       .brand-name {
@@ -108,7 +112,7 @@
 
     <!-- ================= NAVBAR ================= -->
     <nav class="navbar">
-      <span class="brand-name">WatchWise</span>
+      <li class="nav-links"><a href="{% url 'movies:list' %}"><span class="brand-name">WatchWise</span></a></li>
 
       <ul class="nav-links">
         <li><a href="{% url 'movies:list' %}">Movies</a></li>

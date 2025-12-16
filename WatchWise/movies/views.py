@@ -1,15 +1,16 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+# movies/views.py
+from django.http import JsonResponse
+from .tmdb import fetch_movie_data
 
 from .models import Movie, Genre
 
 
-
 def movie_list_view(request):
-    movies = Movie.objects.all().order_by("-created_at")
+    movies = Movie.objects.all()
     genres = Genre.objects.all()
 
     # Filter by genre
@@ -22,7 +23,7 @@ def movie_list_view(request):
     if query:
         movies = movies.filter(
             Q(title__icontains=query) |
-            Q(description__icontains=query)
+            Q(overview__icontains=query)
         )
 
     context = {
@@ -31,18 +32,14 @@ def movie_list_view(request):
         "selected_genre": genre_id,
         "query": query,
     }
-
     return render(request, "movies/movie_list.html", context)
+
 
 @login_required
 def movie_detail_view(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
+    return render(request, "movies/movie_detail.html", {"movie": movie})
 
-    return render(
-        request,
-        "movies/movie_detail.html",
-        {"movie": movie}
-    )
 
 @login_required
 def add_movie_view(request):
@@ -50,25 +47,25 @@ def add_movie_view(request):
 
     if request.method == "POST":
         title = request.POST.get("title")
-        description = request.POST.get("description")
+        overview = request.POST.get("overview")
         release_year = request.POST.get("release_year")
         language = request.POST.get("language")
         duration = request.POST.get("duration")
         selected_genres = request.POST.getlist("genres")
-        poster = request.FILES.get("poster")
+        poster = request.POST.get("poster")  # URL, not file
 
-        # Basic validation
         if not title or not release_year or not duration:
             messages.error(request, "Please fill all required fields.")
             return redirect("movies:add")
 
         movie = Movie.objects.create(
             title=title,
-            description=description,
+            overview=overview,
             release_year=release_year,
             language=language,
             duration_minutes=duration,
             poster=poster,
+            created_by=request.user
         )
 
         movie.genres.set(selected_genres)
@@ -83,4 +80,13 @@ def add_movie_view(request):
     )
 
 
+@login_required
+def tmdb_autofill_view(request):
+    title = request.GET.get("title")
+    year = request.GET.get("year")
 
+    data = fetch_movie_data(title, year)
+    if not data:
+        return JsonResponse({"error": "Movie not found"}, status=404)
+
+    return JsonResponse(data)
