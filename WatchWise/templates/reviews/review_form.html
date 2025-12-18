@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Review {{ movie.title }} | WatchWise{% endblock %}
+
+{% block extra_css %}
+<style>
+  .review-container {
+    max-width: 700px;
+    margin: 70px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
+
+  .review-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  label {
+    font-weight: 600;
+  }
+
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-top: 6px;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #000;
+    color: #f6f0e6;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+
+  .back-link {
+    margin-top: 20px;
+    display: inline-block;
+    text-decoration: none;
+    font-weight: 500;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="review-container">
+
+  <h2>Review: {{ movie.title }}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Rating -->
+    <p>
+      <label for="rating">Rating *</label>
+      <select name="rating" id="rating" required>
+        <option value="">-- Select Rating --</option>
+        {% for value, label in rating_choices %}
+          <option value="{{ value }}"
+            {% if review and review.rating == value %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+    </p>
+
+    <!-- Review Text -->
+    <p>
+      <label for="review_text">Your Review</label>
+      <textarea
+        name="review_text"
+        id="review_text"
+        placeholder="Write your thoughts (optional)"
+      >{{ review.review_text|default_if_none:'' }}</textarea>
+    </p>
+
+    <button type="submit" class="submit-btn">
+      {% if review %}
+        Update Review
+      {% else %}
+        Submit Review
+      {% endif %}
+    </button>
+  </form>
+
+  <a href="{% url 'movies:detail' movie.id %}" class="back-link">
+    ← Back to Movie
+  </a>
+
+</div>
+{% endblock %}

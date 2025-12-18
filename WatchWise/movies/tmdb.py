@@ -48,8 +48,13 @@ def fetch_movie_data(title, year=None):
     params={"language": "en-US"}
 )
     runtime = None
+    genre_ids = []
     if details_response.status_code == 200:
-        runtime = details_response.json().get("runtime")
+        details = details_response.json()
+        runtime = details.get("runtime")
+
+        # 🔥 THIS IS THE KEY PART
+        genre_ids = [g["id"] for g in details.get("genres", [])]
 
     return {
         "title": movie.get("title"),
@@ -61,4 +66,5 @@ def fetch_movie_data(title, year=None):
             TMDB_IMAGE_BASE + movie["poster_path"]
             if movie.get("poster_path") else ""
         ),
+        "genre_ids": genre_ids,
     }

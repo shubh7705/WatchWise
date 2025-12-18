@@ -38,7 +38,22 @@ def movie_list_view(request):
 @login_required
 def movie_detail_view(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
-    return render(request, "movies/movie_detail.html", {"movie": movie})
+
+    reviews = movie.reviews.select_related("user").all()
+    user_review = None
+
+    if request.user.is_authenticated:
+        user_review = reviews.filter(user=request.user).first()
+
+    return render(
+        request,
+        "movies/movie_detail.html",
+        {
+            "movie": movie,
+            "reviews": reviews,
+            "user_review": user_review,
+        }
+    )
 
 
 @login_required
@@ -51,7 +66,7 @@ def add_movie_view(request):
         release_year = request.POST.get("release_year")
         language = request.POST.get("language")
         duration = request.POST.get("duration")
-        selected_genres = request.POST.getlist("genres")
+        genre_ids = request.POST.getlist("genres")
         poster = request.POST.get("poster")  # URL, not file
 
         if not title or not release_year or not duration:
@@ -68,7 +83,8 @@ def add_movie_view(request):
             created_by=request.user
         )
 
-        movie.genres.set(selected_genres)
+        genres = Genre.objects.filter(tmdb_id__in=genre_ids)
+        movie.genres.set(genres)
 
         messages.success(request, "Movie added successfully.")
         return redirect("movies:detail", movie_id=movie.id)

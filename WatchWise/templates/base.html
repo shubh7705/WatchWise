@@ -117,7 +117,7 @@
       <ul class="nav-links">
         <li><a href="{% url 'movies:list' %}">Movies</a></li>
         {% if user.is_authenticated %}
-          <li><a href="{% url 'movies:add' %}">Add Movie</a></li>
+          <li><a href="{% url 'movies:add_movie' %}">Add Movie</a></li>
         {% endif %}
       </ul>
 
