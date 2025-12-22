@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ group.name }}</title>
+</head>
+<body>
+
+<h2>{{ group.name }}</h2>
+<p>{{ group.description }}</p>
+
+<hr>
+
+<h3>Members ({{ group.members.count }})</h3>
+<ul>
+    {% for member in group.members.all %}
+        <li>{{ member.username }}</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+<h3>Discussions</h3>
+
+{% for post in posts %}
+    <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+        <strong>{{ post.user.username }}</strong>
+        <small>• {{ post.created_at }}</small>
+        <p>{{ post.content }}</p>
+    </div>
+{% empty %}
+    <p>No discussions yet. Be the first to post!</p>
+{% endfor %}
+
+<hr>
+
+<h3>Post a Message</h3>
+
+<form method="post">
+    {% csrf_token %}
+    <textarea name="content" rows="3" required></textarea><br><br>
+    <button type="submit">Post</button>
+</form>
+
+<p>
+    <a href="{% url 'groups:list' %}">← Back to Groups</a>
+</p>
+
+</body>
+</html>

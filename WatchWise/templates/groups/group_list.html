@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Groups</title>
+</head>
+<body>
+
+<h2>Discussion Groups</h2>
+
+{% if user.is_authenticated %}
+    <p><a href="{% url 'groups:create' %}">Create New Group</a></p>
+{% endif %}
+
+<ul>
+    {% for group in groups %}
+        <li>
+            <a href="{% url 'groups:detail' group.id %}">
+                {{ group.name }}
+            </a>
+            <br>
+            <small>{{ group.description }}</small>
+        </li>
+    {% empty %}
+        <li>No groups available.</li>
+    {% endfor %}
+</ul>
+
+<p><a href="{% url 'movies:list' %}">← Back to Movies</a></p>
+
+</body>
+</html>
