@@ -2,9 +2,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
-# movies/views.py
 from django.http import JsonResponse
 from .tmdb import fetch_movie_data
+from django.db.models import Avg
 
 from .models import Movie, Genre
 
@@ -44,6 +44,7 @@ def movie_detail_view(request, movie_id):
 
     if request.user.is_authenticated:
         user_review = reviews.filter(user=request.user).first()
+        avg_rating = reviews.aggregate(avg=Avg("rating"))["avg"]
 
     return render(
         request,
@@ -52,6 +53,7 @@ def movie_detail_view(request, movie_id):
             "movie": movie,
             "reviews": reviews,
             "user_review": user_review,
+            "avg_rating": avg_rating,
         }
     )
 

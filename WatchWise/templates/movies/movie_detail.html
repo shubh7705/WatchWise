@@ -168,11 +168,19 @@
     <h3>Reviews</h3>
 
     {% if reviews %}
+    {% if avg_rating %}
+  <p>
+    <strong>Average Rating:</strong>
+    ⭐ {{ avg_rating|floatformat:1 }}/5
+  </p>
+{% else %}
+  <p><strong>Average Rating:</strong> Not rated yet</p>
+{% endif %}
       {% for review in reviews %}
         <div class="review-card {% if user_review and review.id == user_review.id %}your-review{% endif %}">
           <p>
             <strong>{{ review.user.username }}</strong>
-            <span class="rating">⭐ {{ review.rating }}/5</span>
+            <span class="rating">⭐ {{ review.get_rating_display }}</span>
           </p>
 
           {% if review.review_text %}

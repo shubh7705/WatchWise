@@ -177,7 +177,7 @@
         </p>
 
         {% if query %}
-          <a href="{% url 'movies:add' %}?title={{ query }}" class="add-movie-btn">
+          <a href="{% url 'movies:add_movie' %}?title={{ query }}" class="add-movie-btn">
             + Add "{{ query }}" as a new movie
           </a>
         {% endif %}
