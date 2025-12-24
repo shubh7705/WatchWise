@@ -1,49 +1,156 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ group.name }}</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>{{ group.name }}</h2>
-<p>{{ group.description }}</p>
+{% block title %}{{ group.name }} | WatchWise{% endblock %}
 
-<hr>
+{% block extra_css %}
+<style>
+  .group-detail-container {
+    max-width: 900px;
+    margin: 70px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
 
-<h3>Members ({{ group.members.count }})</h3>
-<ul>
+  .group-header h2 {
+    margin-bottom: 8px;
+  }
+
+  .group-header p {
+    margin-bottom: 15px;
+    color: #333;
+  }
+
+  .section {
+    margin-top: 30px;
+  }
+
+  .member-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 6px 6px 0 0;
+    background-color: #000;
+    color: #f6f0e6;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  .post-card {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+
+  .post-card strong {
+    font-size: 15px;
+  }
+
+  .post-card small {
+    color: #666;
+    margin-left: 6px;
+    font-size: 12px;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    resize: vertical;
+  }
+
+  .group-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .group-actions button,
+  .group-actions a {
+    padding: 8px 16px;
+    background-color: #000;
+    color: #f6f0e6;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .group-actions a {
+    background-color: #444;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="group-detail-container">
+
+  <!-- ================= HEADER ================= -->
+  <div class="group-header">
+    <h2>{{ group.name }}</h2>
+    {% if group.description %}
+      <p>{{ group.description }}</p>
+    {% endif %}
+  </div>
+
+  <hr>
+
+  <!-- ================= MEMBERS ================= -->
+  <div class="section">
+    <h3>Members ({{ group.members.count }})</h3>
+
     {% for member in group.members.all %}
-        <li>{{ member.username }}</li>
+      <span class="member-badge">{{ member.username }}</span>
+    {% empty %}
+      <p>No members yet.</p>
     {% endfor %}
-</ul>
+  </div>
 
-<hr>
+  <hr>
 
-<h3>Discussions</h3>
+  <!-- ================= DISCUSSIONS ================= -->
+  <div class="section">
+    <h3>Discussions</h3>
 
-{% for post in posts %}
-    <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-        <strong>{{ post.user.username }}</strong>
-        <small>• {{ post.created_at }}</small>
+    {% for post in posts %}
+      <div class="post-card">
+        <p>
+          <strong>{{ post.user.username }}</strong>
+          <small>• {{ post.created_at|date:"M d, Y H:i" }}</small>
+        </p>
         <p>{{ post.content }}</p>
-    </div>
-{% empty %}
-    <p>No discussions yet. Be the first to post!</p>
-{% endfor %}
+      </div>
+    {% empty %}
+      <p>No discussions yet. Be the first to post!</p>
+    {% endfor %}
+  </div>
 
-<hr>
+  <hr>
 
-<h3>Post a Message</h3>
+  <!-- ================= POST MESSAGE ================= -->
+  {% if user.is_authenticated %}
+  <div class="section">
+    <h3>Post a Message</h3>
 
-<form method="post">
-    {% csrf_token %}
-    <textarea name="content" rows="3" required></textarea><br><br>
-    <button type="submit">Post</button>
-</form>
+    <form method="post">
+      {% csrf_token %}
+      <textarea name="content" rows="3" placeholder="Write something..." required></textarea>
 
-<p>
-    <a href="{% url 'groups:list' %}">← Back to Groups</a>
-</p>
+      <div class="group-actions">
+        <button type="submit">💬 Post Message</button>
+        <a href="{% url 'groups:list' %}">← Back to Groups</a>
+      </div>
+    </form>
+  </div>
+  {% else %}
+    <p>
+      <a href="{% url 'login' %}">Login</a> to join the discussion.
+    </p>
+  {% endif %}
 
-</body>
-</html>
+</div>
+{% endblock %}
