@@ -119,6 +119,9 @@
         {% if user.is_authenticated %}
           <li><a href="{% url 'movies:add_movie' %}">Add Movie</a></li>
         {% endif %}
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'groups:list' %}">Clubs</a></li>
+        {% endif %}
       </ul>
 
       <div class="nav-right">
