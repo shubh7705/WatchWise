@@ -1,1 +1,1 @@
-web: gunicorn watchwise.wsgi
+web: gunicorn WatchWise.wsgi
