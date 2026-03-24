@@ -40,11 +40,14 @@ def group_detail_view(request, group_id):
 
     if request.method == "POST":
         content = request.POST.get("content")
-        if content:
+        image = request.FILES.get("image")
+        
+        if content or image:
             GroupPost.objects.create(
                 group=group,
                 user=request.user,
-                content=content
+                content=content or "",
+                image=image
             )
             return redirect("groups:detail", group_id=group.id)
 

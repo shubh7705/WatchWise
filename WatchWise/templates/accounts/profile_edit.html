@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile | WatchWise{% endblock %}
+
+{% block content %}
+<div class="glass-panel animate-fade-in" style="max-width: 600px; margin: 50px auto; padding: 40px; border-radius: 16px;">
+  
+  <h2 class="title-glow" style="text-align: center; margin-bottom: 30px;"><i class="fa-solid fa-user-pen"></i> Edit Profile</h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <!-- Profile Image Upload -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <div style="position: relative; display: inline-block;">
+        {% if profile.profile_image %}
+          <img src="{{ profile.profile_image.url }}" alt="Current Profile" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); box-shadow: 0 4px 15px rgba(0,0,0,0.2);" id="imagePreview">
+        {% else %}
+          <div style="width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border: 3px dashed var(--border-color); margin: 0 auto;" id="imagePreviewContainer">
+            <i class="fa-solid fa-user fa-3x" style="color: var(--text-muted);" id="imagePreviewIcon"></i>
+            <img src="" style="display: none; width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" id="imagePreviewImg">
+          </div>
+        {% endif %}
+        
+        <label for="profile_image" class="btn btn-primary" style="position: absolute; bottom: -10px; right: -10px; border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+          <i class="fa-solid fa-camera"></i>
+        </label>
+        <input type="file" id="profile_image" name="profile_image" accept="image/*" style="display: none;" onchange="previewImage(event)">
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 15px;">Click the camera icon to upload a new picture (max 2MB)</p>
+    </div>
+
+    <!-- Bio Field -->
+    <div class="input-group" style="margin-bottom: 30px;">
+      <label style="display: block; margin-bottom: 10px; font-weight: 500; color: var(--text-primary);">
+        <i class="fa-solid fa-book" style="color: var(--accent);"></i> Short Bio
+      </label>
+      <textarea name="bio" class="modern-input" style="min-height: 120px; width: 100%; border-radius: 12px; font-family: inherit; font-size: 0.95rem; resize: vertical;" placeholder="Tell us about your favorite movies or genres...">{{ profile.bio }}</textarea>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; gap: 15px;">
+      <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">
+        <i class="fa-solid fa-save"></i> Save Changes
+      </button>
+      <a href="{% url 'accounts:profile' %}" class="btn btn-secondary" style="flex: 1; justify-content: center;">
+        Cancel
+      </a>
+    </div>
+  </form>
+
+</div>
+
+<script>
+function previewImage(event) {
+  var reader = new FileReader();
+  reader.onload = function(){
+    let preview = document.getElementById('imagePreview');
+    if (preview) {
+      preview.src = reader.result;
+    } else {
+      let icon = document.getElementById('imagePreviewIcon');
+      let img = document.getElementById('imagePreviewImg');
+      let container = document.getElementById('imagePreviewContainer');
+      
+      icon.style.display = 'none';
+      img.style.display = 'block';
+      img.src = reader.result;
+      container.style.border = '3px solid var(--accent)';
+    }
+  };
+  if(event.target.files[0]) {
+    reader.readAsDataURL(event.target.files[0]);
+  }
+}
+</script>
+{% endblock %}

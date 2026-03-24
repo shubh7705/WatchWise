@@ -38,6 +38,7 @@ class GroupPost(models.Model):
     )
 
     content = models.TextField()
+    image = models.ImageField(upload_to="group_posts/", blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

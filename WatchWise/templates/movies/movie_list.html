@@ -2,186 +2,106 @@
 
 {% block title %}Movies | WatchWise{% endblock %}
 
-{% block extra_css %}
-<style>
-  .container {
-    max-width: 1100px;
-    margin: 50px auto;
-    padding: 0 20px;
-  }
-
-  h2 {
-    margin-bottom: 20px;
-  }
-
-  .filters {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-  }
-
-  .filters input,
-  .filters select {
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-  }
-
-  .movie-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 25px;
-  }
-
-  .movie-card {
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    transition: 0.3s ease;
-  }
-
-  .movie-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.12);
-  }
-
-  .movie-card a {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .movie-poster {
-    width: 100%;
-    height: 300px;
-    background: #e5e5e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    color: #666;
-  }
-
-  .movie-poster img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .movie-content {
-    padding: 15px;
-  }
-
-  .movie-title {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-
-  .movie-year {
-    font-size: 14px;
-    color: #777;
-  }
-
-  .empty {
-    margin-top: 40px;
-    text-align: center;
-    padding: 40px;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  }
-
-  .empty p {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 20px;
-  }
-
-  .add-movie-btn {
-    display: inline-block;
-    padding: 12px 22px;
-    background: #4f46e5;
-    color: #fff;
-    border-radius: 10px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.3s ease;
-  }
-
-  .add-movie-btn:hover {
-    background: #4338ca;
-    transform: translateY(-2px);
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container">
-
-  <h2>Movies</h2>
+<div class="glass-panel">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2 class="title-glow"><i class="fa-solid fa-film"></i> Explore Movies</h2>
+    {% if user.is_authenticated %}
+    <a href="{% url 'movies:add_movie' %}" class="btn btn-primary">
+      <i class="fa-solid fa-plus"></i> Add New Movie
+    </a>
+    {% endif %}
+  </div>
 
   <!-- ================= FILTERS ================= -->
-  <div class="filters">
-    <form method="get">
-      <input
-        type="text"
-        name="q"
-        placeholder="Search movies..."
-        value="{{ query|default:'' }}"
-      />
-    </form>
+  <div class="glass-panel" style="padding: 20px; margin-bottom: 30px; background: var(--bg-secondary);">
+    <form method="get" style="display: flex; gap: 15px; flex-wrap: wrap;">
+      <div class="input-group" style="flex: 1; min-width: 250px; margin: 0;">
+        <input type="text" name="q" class="modern-input" placeholder="Search movies..."
+          value="{{ query|default:'' }}" />
+      </div>
 
-    <form method="get">
-      <select name="genre" onchange="this.form.submit()">
-        <option value="">All Genres</option>
-        {% for genre in genres %}
-          <option value="{{ genre.id }}"
-            {% if selected_genre == genre.id|stringformat:"s" %}selected{% endif %}>
+      <div class="input-group" style="min-width: 200px; margin: 0;">
+        <select name="genre" class="modern-input" onchange="this.form.submit()">
+          <option value="">All Genres</option>
+          {% for genre in genres %}
+          <option value="{{ genre.id }}" {% if selected_genre|stringformat:"s" == genre.id|stringformat:"s" %}selected{% endif %}>
             {{ genre.name }}
           </option>
-        {% endfor %}
-      </select>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" style="display: none;"></button>
     </form>
   </div>
 
   <!-- ================= MOVIE CARDS ================= -->
-  <div class="movie-grid">
-    {% for movie in movies %}
-      <div class="movie-card">
-        <a href="{% url 'movies:detail' movie.id %}">
 
-          <div class="movie-poster">
-            {% if movie.poster %}
-              <img src="{{ movie.poster }}" alt="{{ movie.title }}">
-            {% else %}
-              No Poster
-            {% endif %}
-          </div>
+  {% if recommended_movies %}
+  <h2>🎯 Recommended for You</h2>
 
-          <div class="movie-content">
-            <div class="movie-title">{{ movie.title }}</div>
-            {% if movie.release_year %}
-              <div class="movie-year">{{ movie.release_year }}</div>
-            {% endif %}
-          </div>
-
-        </a>
-      </div>
-    {% empty %}
-      <div class="empty">
-        <p>
-          No movies found{% if query %} for "<strong>{{ query }}</strong>"{% endif %}.
-        </p>
-
-        {% if query %}
-          <a href="{% url 'movies:add_movie' %}?title={{ query }}" class="add-movie-btn">
-            + Add "{{ query }}" as a new movie
-          </a>
+  <div class="modern-grid">
+    {% for movie in recommended_movies %}
+    <a href="{% url 'movies:detail' movie.id %}" class="movie-card">
+      <div class="movie-poster-container">
+        {% if movie.poster %}
+        <img src="{{ movie.poster }}" alt="{{ movie.title }}">
+        {% else %}
+        <div
+          style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--text-muted); padding: 20px; text-align: center;">
+          <i class="fa-solid fa-image fa-3x" style="opacity: 0.2; margin-bottom: 10px;"></i>
+          No Poster Available
+        </div>
         {% endif %}
       </div>
+      <div class="movie-info">
+        <div class="movie-title">{{ movie.title }}</div>
+        {% if movie.release_year %}
+        <div class="movie-year"><i class="fa-regular fa-calendar"></i> {{ movie.release_year }}</div>
+        {% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <hr>
+  {% endif %}
+
+  <div class="modern-grid">
+    {% for movie in movies %}
+    <a href="{% url 'movies:detail' movie.id %}" class="movie-card">
+      <div class="movie-poster-container">
+        {% if movie.poster %}
+        <img src="{{ movie.poster }}" alt="{{ movie.title }}">
+        {% else %}
+        <div
+          style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--text-muted); padding: 20px; text-align: center;">
+          <i class="fa-solid fa-image fa-3x" style="opacity: 0.2; margin-bottom: 10px;"></i>
+          No Poster Available
+        </div>
+        {% endif %}
+      </div>
+      <div class="movie-info">
+        <div class="movie-title">{{ movie.title }}</div>
+        {% if movie.release_year %}
+        <div class="movie-year"><i class="fa-regular fa-calendar"></i> {{ movie.release_year }}</div>
+        {% endif %}
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty-state" style="grid-column: 1 / -1;">
+      <i class="fa-solid fa-film"></i>
+      <h3>No Movies Found</h3>
+      <p>
+        We couldn't find any movies{% if query %} matching "<strong>{{ query }}</strong>"{% endif %}.
+      </p>
+
+      {% if query %}
+      <a href="{% url 'movies:add_movie' %}?title={{ query }}" class="btn btn-primary" style="margin-top: 20px;">
+        <i class="fa-solid fa-plus"></i> Add "{{ query }}" to Database
+      </a>
+      {% endif %}
+    </div>
     {% endfor %}
   </div>
 

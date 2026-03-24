@@ -10,4 +10,5 @@ urlpatterns = [
     path("add/", views.add_movie_view, name="add_movie"),
     path("<int:movie_id>/", views.movie_detail_view, name="detail"),
     path("autofill/", views.tmdb_autofill_view, name="autofill"),
+    path("toggle-watch/<int:movie_id>/", views.toggle_watch, name="toggle_watch"),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

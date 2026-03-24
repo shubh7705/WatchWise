@@ -1,24 +1,27 @@
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .tmdb import fetch_movie_data
 from django.db.models import Avg
+from .recommender import get_recommendations
 
-from .models import Movie, Genre
+from .models import Movie, Genre, WatchHistory
 
 
 def movie_list_view(request):
     movies = Movie.objects.all()
     genres = Genre.objects.all()
 
-    # Filter by genre
+    # 🔍 Filter by genre
     genre_id = request.GET.get("genre")
     if genre_id:
+        genre_id = int(genre_id)
         movies = movies.filter(genres__id=genre_id)
 
-    # Search
+    # 🔍 Search
     query = request.GET.get("q")
     if query:
         movies = movies.filter(
@@ -26,12 +29,19 @@ def movie_list_view(request):
             Q(overview__icontains=query)
         )
 
+    # 🎯 Get recommendations (only if logged in and no search/filter active)
+    recommended_movies = []
+    if request.user.is_authenticated and not query and not genre_id:
+        recommended_movies = get_recommendations(request.user)
+
     context = {
         "movies": movies,
+        "recommended_movies": recommended_movies,  # 👈 ADD THIS
         "genres": genres,
         "selected_genre": genre_id,
         "query": query,
     }
+
     return render(request, "movies/movie_list.html", context)
 
 
@@ -40,11 +50,16 @@ def movie_detail_view(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
 
     reviews = movie.reviews.select_related("user").all()
-    user_review = None
+    user_review = reviews.filter(user=request.user).first()
 
-    if request.user.is_authenticated:
-        user_review = reviews.filter(user=request.user).first()
-        avg_rating = reviews.aggregate(avg=Avg("rating"))["avg"]
+    avg_rating = reviews.aggregate(avg=Avg("rating"))["avg"]
+
+    # ✅ Check if watched
+    is_watched = WatchHistory.objects.filter(
+        user=request.user,
+        movie=movie,
+        watched=True
+    ).exists()
 
     return render(
         request,
@@ -54,9 +69,9 @@ def movie_detail_view(request, movie_id):
             "reviews": reviews,
             "user_review": user_review,
             "avg_rating": avg_rating,
+            "is_watched": is_watched,  # 👈 send to template
         }
     )
-
 
 @login_required
 def add_movie_view(request):
@@ -108,3 +123,28 @@ def tmdb_autofill_view(request):
         return JsonResponse({"error": "Movie not found"}, status=404)
 
     return JsonResponse(data)
+
+@require_POST
+@login_required
+def toggle_watch(request, movie_id):
+    movie = get_object_or_404(Movie, id=movie_id)
+
+    obj, created = WatchHistory.objects.get_or_create(
+        user=request.user,
+        movie=movie
+    )
+
+    if obj.watched:
+        obj.watched = False
+        status = "removed"
+    else:
+        obj.watched = True
+        status = "added"
+
+    obj.save()
+
+    return JsonResponse({
+        "status": status,
+        "watched": obj.watched
+    })
+

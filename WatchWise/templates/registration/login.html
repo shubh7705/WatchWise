@@ -2,67 +2,32 @@
 
 {% block title %}Login | WatchWise{% endblock %}
 
-{% block extra_css %}
-<style>
-  .login-container {
-    max-width: 400px;
-    margin: 90px auto;
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  }
-
-  .login-container h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    margin-top: 5px;
-  }
-
-  .submit-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #000;
-    color: #f6f0e6;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-
-  .error-msg {
-    color: red;
-    text-align: center;
-    margin-bottom: 10px;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="login-container">
-  <h2>Login</h2>
+<div class="auth-wrapper">
+  <div class="glass-panel auth-card animate-fade-in">
+    <div style="margin-bottom: 20px;">
+      <i class="fa-solid fa-user-circle fa-4x" style="color: var(--accent);"></i>
+    </div>
+    <h2 class="title-glow">Welcome Back</h2>
 
-  {% if form.errors %}
-    <p class="error-msg">Invalid username or password</p>
-  {% endif %}
+    {% if form.errors %}
+      <div style="background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Invalid username or password
+      </div>
+    {% endif %}
 
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="submit-btn">Login</button>
-  </form>
+    <form method="post" style="text-align: left;">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 12px;">
+        <i class="fa-solid fa-right-to-bracket"></i> Login
+      </button>
+    </form>
 
-  <p style="text-align:center; margin-top:15px;">
-    Don’t have an account?
-    <a href="{% url 'accounts:signup' %}">Sign up</a>
-  </p>
+    <p style="text-align:center; margin-top: 25px; color: var(--text-secondary);">
+      Don’t have an account?
+      <a href="{% url 'accounts:signup' %}" style="font-weight: 600;">Sign up</a>
+    </p>
+  </div>
 </div>
 {% endblock %}

@@ -2,196 +2,170 @@
 
 {% block title %}{{ movie.title }} | WatchWise{% endblock %}
 
-{% block extra_css %}
-<style>
-  .movie-detail-container {
-    max-width: 900px;
-    margin: 70px auto;
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  }
-
-  .movie-header {
-    display: flex;
-    gap: 30px;
-    flex-wrap: wrap;
-  }
-
-  .movie-poster img {
-    width: 220px;
-    border-radius: 10px;
-  }
-
-  .movie-info h2 {
-    margin-bottom: 15px;
-  }
-
-  .movie-info p {
-    margin-bottom: 10px;
-  }
-
-  .genres {
-    margin-top: 10px;
-  }
-
-  .genre-badge {
-    display: inline-block;
-    padding: 5px 10px;
-    margin: 4px 4px 0 0;
-    background-color: #000;
-    color: #f6f0e6;
-    border-radius: 20px;
-    font-size: 13px;
-  }
-
-  .movie-actions {
-    margin-top: 25px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-
-  .movie-actions a,
-  .review-btn {
-    padding: 8px 16px;
-    background-color: #000;
-    color: #f6f0e6;
-    border-radius: 6px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
-  }
-
-  .login-note {
-    margin-top: 15px;
-    font-style: italic;
-  }
-
-  /* ================= REVIEWS ================= */
-
-  .reviews-section {
-    margin-top: 30px;
-  }
-
-  .review-card {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-  }
-
-  .review-card strong {
-    font-size: 15px;
-  }
-
-  .rating {
-    font-size: 14px;
-    margin-left: 6px;
-  }
-
-  .your-review {
-    border: 2px solid #000;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="movie-detail-container">
+<div class="glass-panel">
+  
+  <div class="movie-actions" style="margin-bottom: 25px;">
+    <a href="{% url 'movies:list' %}" class="btn btn-secondary" style="padding: 8px 16px;">
+      <i class="fa-solid fa-arrow-left"></i> Back to Movies
+    </a>
+  </div>
 
-  <!-- ================= HEADER ================= -->
-  <div class="movie-header">
-    {% if movie.poster %}
-      <div class="movie-poster">
-        <img src="{{ movie.poster }}" alt="{{ movie.title }}">
+  <div class="movie-detail-grid">
+    <!-- Poster -->
+    <div>
+      {% if movie.poster %}
+        <img src="{{ movie.poster }}" alt="{{ movie.title }}" class="detail-poster">
+      {% else %}
+        <div class="detail-poster" style="aspect-ratio: 2/3; background: var(--border); display: flex; align-items: center; justify-content: center; border-radius: 16px;">
+          <i class="fa-solid fa-image fa-4x" style="color: var(--text-muted); opacity: 0.5;"></i>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Info -->
+    <div>
+      <h2 class="title-glow" style="font-size: 2.5rem; margin-bottom: 10px;">{{ movie.title }}</h2>
+      
+      <div style="display: flex; gap: 15px; margin-bottom: 20px; color: var(--text-secondary); font-weight: 500;">
+        {% if movie.release_year %}
+          <span><i class="fa-regular fa-calendar"></i> {{ movie.release_year }}</span>
+        {% endif %}
+        {% if movie.duration_minutes %}
+          <span><i class="fa-regular fa-clock"></i> {{ movie.duration_minutes }} min</span>
+        {% endif %}
+        {% if movie.language %}
+          <span><i class="fa-solid fa-globe"></i> {{ movie.language }}</span>
+        {% endif %}
       </div>
-    {% endif %}
 
-    <div class="movie-info">
-      <h2>{{ movie.title }}</h2>
-
-      {% if movie.overview %}
-        <p><strong>Overview:</strong> {{ movie.overview }}</p>
-      {% endif %}
-
-      <p><strong>Release Year:</strong> {{ movie.release_year }}</p>
-
-      {% if movie.language %}
-        <p><strong>Language:</strong> {{ movie.language }}</p>
-      {% endif %}
-
-      {% if movie.duration_minutes %}
-        <p><strong>Duration:</strong> {{ movie.duration_minutes }} minutes</p>
-      {% endif %}
-
-      <div class="genres">
-        <strong>Genres:</strong><br>
+      <div style="margin-bottom: 25px;">
         {% for genre in movie.genres.all %}
-          <span class="genre-badge">{{ genre.name }}</span>
+          <span class="detail-badge">{{ genre.name }}</span>
         {% empty %}
-          <span>No genres specified</span>
+          <span class="detail-badge">Uncategorized</span>
         {% endfor %}
       </div>
+
+      {% if movie.overview %}
+        <div style="margin-bottom: 30px;">
+          <h3 style="margin-bottom: 10px; font-size: 1.25rem;">Overview</h3>
+          <p style="color: var(--text-secondary); line-height: 1.8;">{{ movie.overview }}</p>
+        </div>
+      {% endif %}
+
+      <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 30px;">
+        <button id="watch-btn" class="btn btn-secondary" data-movie-id="{{ movie.id }}">
+          {% if is_watched %}
+            <i class="fa-solid fa-check"></i> Remove from Watched
+          {% else %}
+            <i class="fa-regular fa-eye"></i> Mark as Watched
+          {% endif %}
+        </button>
+        
+        {% if user.is_authenticated %}
+          <a href="{% url 'reviews:add_or_update' movie.id %}" class="btn btn-primary">
+            {% if user_review %}
+              <i class="fa-solid fa-pen-to-square"></i> Edit Your Review
+            {% else %}
+              <i class="fa-solid fa-star"></i> Write a Review
+            {% endif %}
+          </a>
+        {% endif %}
+      </div>
+
     </div>
   </div>
 
-  <hr style="margin:30px 0;">
+  <hr>
 
-  <!-- ================= REVIEW ACTION ================= -->
-
-  <div class="movie-actions">
-    <a href="{% url 'movies:list' %}">← Back to Movie List</a>
-
-    {% if user.is_authenticated %}
-      {% if user_review %}
-        <a href="{% url 'reviews:add_or_update' movie.id %}" class="review-btn">
-          ✏️ Edit Your Review
-        </a>
-      {% else %}
-        <a href="{% url 'reviews:add_or_update' movie.id %}" class="review-btn">
-          ✍️ Write a Review
-        </a>
+  <!-- REVIEWS -->
+  <div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+      <h3><i class="fa-regular fa-comments"></i> User Reviews</h3>
+      {% if avg_rating %}
+        <div class="detail-badge" style="font-size: 16px; display: flex; align-items: center; gap: 5px; margin: 0;">
+          <i class="fa-solid fa-star" style="color: #f59e0b;"></i>
+          <span>{{ avg_rating|floatformat:1 }}/5 Average</span>
+        </div>
       {% endif %}
+    </div>
+
+    {% if not user.is_authenticated %}
+      <div class="glass-panel" style="padding: 15px 25px; margin-bottom: 25px; background: rgba(99, 102, 241, 0.05); border-color: var(--accent);">
+        <p style="margin: 0;">
+          <i class="fa-solid fa-lock" style="color: var(--accent);"></i> <a href="{% url 'login' %}" style="font-weight: 600;">Log in</a> to write a review.
+        </p>
+      </div>
     {% endif %}
-  </div>
 
-  {% if not user.is_authenticated %}
-    <p class="login-note">
-      <a href="{% url 'login' %}">Login</a> to write a review.
-    </p>
-  {% endif %}
-
-  <!-- ================= REVIEWS ================= -->
-
-  <div class="reviews-section">
-    <h3>Reviews</h3>
-
-    {% if reviews %}
-    {% if avg_rating %}
-  <p>
-    <strong>Average Rating:</strong>
-    ⭐ {{ avg_rating|floatformat:1 }}/5
-  </p>
-{% else %}
-  <p><strong>Average Rating:</strong> Not rated yet</p>
-{% endif %}
+    <div>
       {% for review in reviews %}
-        <div class="review-card {% if user_review and review.id == user_review.id %}your-review{% endif %}">
-          <p>
-            <strong>{{ review.user.username }}</strong>
-            <span class="rating">⭐ {{ review.get_rating_display }}</span>
-          </p>
-
+        <div class="review-card" {% if user_review and review.id == user_review.id %}style="border-color: var(--accent); position: relative;"{% endif %}>
+          {% if user_review and review.id == user_review.id %}
+            <div style="position: absolute; top: -10px; right: 20px; background: var(--accent); color: white; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 600;"><i class="fa-solid fa-user"></i> Your Review</div>
+          {% endif %}
+          <div class="review-header">
+            <div class="review-author">
+              <i class="fa-solid fa-circle-user fa-lg" style="color: var(--text-muted)"></i>
+              {{ review.user.username }}
+            </div>
+            <div class="rating-stars">
+              {% for i in "12345"|make_list %}
+                <i class="{% if forloop.counter <= review.rating %}fa-solid{% else %}fa-regular{% endif %} fa-star"></i>
+              {% endfor %}
+            </div>
+          </div>
           {% if review.review_text %}
-            <p>{{ review.review_text }}</p>
+            <p style="color: var(--text-secondary); margin-top: 5px; line-height: 1.6;">{{ review.review_text }}</p>
           {% endif %}
         </div>
+      {% empty %}
+        <div class="empty-state">
+          <i class="fa-regular fa-comment-dots"></i>
+          <p>No reviews yet. Be the first to share your thoughts!</p>
+        </div>
       {% endfor %}
-    {% else %}
-      <p>No reviews yet.</p>
-    {% endif %}
+    </div>
   </div>
 
 </div>
+
+<script>
+  document.getElementById("watch-btn").addEventListener("click", function() {
+    const movieId = this.dataset.movieId;
+    const btn = this;
+
+    fetch(`/movies/toggle-watch/${movieId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.watched) {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Remove from Watched';
+        } else {
+            btn.innerHTML = '<i class="fa-regular fa-eye"></i> Mark as Watched';
+        }
+    })
+    .catch(error => console.error("Error:", error));
+  });
+
+  // CSRF helper
+  function getCSRFToken() {
+      let cookieValue = null;
+      const cookies = document.cookie.split(';');
+
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith('csrftoken=')) {
+              cookieValue = cookie.substring('csrftoken='.length);
+          }
+      }
+      return cookieValue;
+  }
+</script>
 {% endblock %}

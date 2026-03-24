@@ -2,140 +2,77 @@
 
 {% block title %}Add Movie | WatchWise{% endblock %}
 
-{% block extra_css %}
-<style>
-  .add-movie-container {
-    max-width: 700px;
-    margin: 70px auto;
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  }
-
-  .add-movie-container h2 {
-    text-align: center;
-    margin-bottom: 25px;
-  }
-
-  form p {
-    margin-bottom: 15px;
-  }
-
-  label {
-    font-weight: 600;
-  }
-
-  input[type="text"],
-  input[type="number"],
-  textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    margin-top: 5px;
-  }
-
-  textarea {
-    resize: vertical;
-    min-height: 80px;
-  }
-
-  .genres {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 5px;
-  }
-
-  .genres label {
-    font-weight: 400;
-  }
-
-  .submit-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: #000;
-    color: #f6f0e6;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 20px;
-  }
-
-  .autofill-btn {
-    margin-top: 10px;
-    background: #f5c518;
-    color: #000;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="add-movie-container">
-
-  <h2>Add Movie</h2>
+<div class="glass-panel animate-fade-in" style="max-width: 800px; margin: 40px auto; padding: 40px;">
+  
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h2 class="title-glow"><i class="fa-solid fa-film"></i> Add New Movie</h2>
+    <p style="color: var(--text-secondary);">Add a new movie to the WatchWise database manually or autofill from TMDB.</p>
+  </div>
 
   <form method="post">
     {% csrf_token %}
 
-    <p>
-      <label>Title *</label>
-      <input type="text" id="title" name="title" required>
-      <button type="button" class="autofill-btn" onclick="autofillMovie()">
-        Auto-Fill with TMDB 🤖
-      </button>
-    </p>
+    <div class="input-group">
+      <label>Title <span style="color: var(--danger);">*</span></label>
+      <div style="display: flex; gap: 10px;">
+        <input type="text" id="title" name="title" class="modern-input" required>
+        <button type="button" class="btn btn-secondary" onclick="autofillMovie()" style="white-space: nowrap;">
+          <i class="fa-solid fa-robot" style="color: #f5c518;"></i> Auto-Fill
+        </button>
+      </div>
+    </div>
 
-    <p>
-      <label>Release Year *</label>
-      <input type="number" id="release_year" name="release_year" required>
-    </p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div class="input-group">
+        <label>Release Year <span style="color: var(--danger);">*</span></label>
+        <input type="number" id="release_year" name="release_year" class="modern-input" required>
+      </div>
 
-    <p>
+      <div class="input-group">
+        <label>Duration (minutes) <span style="color: var(--danger);">*</span></label>
+        <input type="number" id="duration" name="duration" class="modern-input" required>
+      </div>
+    </div>
+
+    <div class="input-group">
       <label>Overview</label>
-      <textarea id="overview" name="overview"></textarea>
-    </p>
+      <textarea id="overview" name="overview" class="modern-input" style="min-height: 100px;"></textarea>
+    </div>
 
-    <p>
-      <label>Language</label>
-      <input type="text" id="language" name="language">
-    </p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div class="input-group">
+        <label>Language</label>
+        <input type="text" id="language" name="language" class="modern-input">
+      </div>
 
-    <p>
-      <label>Duration (minutes) *</label>
-      <input type="number" id="duration" name="duration" required>
-    </p>
+      <div class="input-group">
+        <label>Poster URL</label>
+        <input type="text" id="poster" name="poster" class="modern-input" placeholder="https://...">
+      </div>
+    </div>
 
-    <p>
-      <label>Poster URL</label>
-      <input type="text" id="poster" name="poster">
-    </p>
-
-    <p>
+    <div class="input-group">
       <label>Genres</label>
-      <div class="genres">
+      <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; padding: 15px; background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border);">
         {% for genre in genres %}
-          <label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary); font-weight: 500;">
             <input
               type="checkbox"
               name="genres"
               value="{{ genre.tmdb_id }}"
               class="genre-checkbox"
+              style="width: 18px; height: 18px; accent-color: var(--accent);"
             >
             {{ genre.name }}
           </label>
         {% endfor %}
       </div>
-    </p>
+    </div>
 
-    <button type="submit" class="submit-btn">Add Movie</button>
+    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 16px;">
+      <i class="fa-solid fa-plus-circle"></i> Add Movie to Database
+    </button>
   </form>
 
 </div>
@@ -144,17 +81,21 @@
 function autofillMovie() {
   const title = document.getElementById("title").value;
   const year = document.getElementById("release_year").value;
+  const btn = document.querySelector('.btn-secondary');
 
   if (!title) {
     alert("Please enter title to autofill.");
     return;
   }
+  
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Searching...';
 
   fetch(`/movies/autofill/?title=${encodeURIComponent(title)}&year=${year}`)
     .then(res => res.json())
     .then(data => {
-      console.log("Autofill response:", data); // debug (safe to keep)
-
+      btn.innerHTML = originalHtml;
+      
       if (data.error) {
         alert(data.error);
         return;
@@ -166,7 +107,6 @@ function autofillMovie() {
       document.getElementById("duration").value = data.runtime || "";
       document.getElementById("poster").value = data.poster || "";
 
-      // ✅ FIXED AUTO-CHECK (string/number safe)
       if (Array.isArray(data.genre_ids)) {
         const genreIds = data.genre_ids.map(Number);
 
@@ -176,10 +116,10 @@ function autofillMovie() {
       }
     })
     .catch(err => {
+      btn.innerHTML = originalHtml;
       console.error(err);
       alert("Failed to fetch movie data");
     });
 }
 </script>
-
 {% endblock %}

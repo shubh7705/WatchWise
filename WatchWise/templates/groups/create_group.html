@@ -1,83 +1,35 @@
 {% extends "base.html" %}
 
-{% block title %}Create Group | WatchWise{% endblock %}
-
-{% block extra_css %}
-<style>
-  .group-container {
-    max-width: 700px;
-    margin: 70px auto;
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  }
-
-  .group-container h2 {
-    margin-bottom: 20px;
-  }
-
-  label {
-    font-weight: 600;
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  input, textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    margin-bottom: 18px;
-    font-size: 14px;
-  }
-
-  textarea {
-    resize: vertical;
-  }
-
-  .group-actions {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
-
-  .group-actions button,
-  .group-actions a {
-    padding: 8px 16px;
-    background-color: #000;
-    color: #f6f0e6;
-    border-radius: 6px;
-    font-weight: 600;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .group-actions a {
-    background-color: #444;
-  }
-</style>
-{% endblock %}
+{% block title %}Create Club | WatchWise{% endblock %}
 
 {% block content %}
-<div class="group-container">
+<div class="glass-panel animate-fade-in" style="max-width: 600px; margin: 50px auto; padding: 40px;">
 
-  <h2>Create a New Group</h2>
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h2 class="title-glow"><i class="fa-solid fa-users"></i> Create a New Club</h2>
+    <p style="color: var(--text-secondary);">Start a new community discussion group.</p>
+  </div>
 
   <form method="post">
     {% csrf_token %}
 
-    <label>Group Name *</label>
-    <input type="text" name="name" placeholder="Enter group name" required>
+    <div class="input-group">
+      <label>Club Name <span style="color: var(--danger);">*</span></label>
+      <input type="text" name="name" class="modern-input" placeholder="e.g. Scifi Fanatics" required>
+    </div>
 
-    <label>Description</label>
-    <textarea name="description" rows="4" placeholder="What is this group about?"></textarea>
+    <div class="input-group">
+      <label>Description</label>
+      <textarea name="description" class="modern-input" style="min-height: 120px;" placeholder="What is this club about?"></textarea>
+    </div>
 
-    <div class="group-actions">
-      <button type="submit">➕ Create Group</button>
-      <a href="{% url 'groups:list' %}">← Back to Groups</a>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 30px;">
+      <button type="submit" class="btn btn-primary" style="flex: 1;">
+        <i class="fa-solid fa-plus-circle"></i> Create Club
+      </button>
+      <a href="{% url 'groups:list' %}" class="btn btn-secondary" style="flex: 1; text-align: center;">
+        Cancel
+      </a>
     </div>
   </form>
 

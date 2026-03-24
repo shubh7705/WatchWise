@@ -2,155 +2,380 @@
 
 {% block title %}{{ group.name }} | WatchWise{% endblock %}
 
-{% block extra_css %}
+{% block content %}
 <style>
-  .group-detail-container {
-    max-width: 900px;
-    margin: 70px auto;
-    background-color: #fff;
-    padding: 30px;
+  /* Chat UI Styles */
+  .chat-wrapper {
+    display: flex;
+    height: calc(100vh - 120px); /* Leave room for navbar and some margin */
+    min-height: 500px;
+    max-height: 900px;
+    margin: 20px auto;
+    max-width: 1400px;
+    background: var(--bg-secondary);
     border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    border: 1px solid var(--border-color);
   }
 
-  .group-header h2 {
-    margin-bottom: 8px;
+  /* Sidebar */
+  .chat-sidebar {
+    width: 320px;
+    background: rgba(0, 0, 0, 0.15);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .chat-sidebar-content {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  /* Main Chat Area */
+  .chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+  }
+  
+  .chat-header {
+    padding: 15px 25px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  .group-header p {
-    margin-bottom: 15px;
-    color: #333;
+  /* Messages Area */
+  .chat-messages {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Chat Bubbles */
+  .chat-bubble-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 75%;
+  }
+  .chat-bubble-wrapper.own {
+    align-self: flex-end;
+  }
+  .chat-bubble-wrapper.other {
+    align-self: flex-start;
   }
 
-  .section {
-    margin-top: 30px;
+  .chat-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .own .chat-meta {
+    flex-direction: row-reverse;
   }
 
-  .member-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    margin: 6px 6px 0 0;
-    background-color: #000;
-    color: #f6f0e6;
-    border-radius: 20px;
-    font-size: 13px;
+  .chat-bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
+    line-height: 1.5;
+    word-break: break-word;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .own .chat-bubble {
+    background: var(--accent);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .other .chat-bubble {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-bottom-left-radius: 4px;
   }
 
-  .post-card {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 12px;
+  .chat-image {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: block;
   }
 
-  .post-card strong {
-    font-size: 15px;
+  /* Input Area */
+  .chat-input-area {
+    padding: 20px 25px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
   }
-
-  .post-card small {
-    color: #666;
-    margin-left: 6px;
-    font-size: 12px;
-  }
-
-  textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    resize: vertical;
-  }
-
-  .group-actions {
-    margin-top: 15px;
+  .chat-form {
     display: flex;
     gap: 15px;
-    flex-wrap: wrap;
+    align-items: flex-end;
   }
-
-  .group-actions button,
-  .group-actions a {
-    padding: 8px 16px;
-    background-color: #000;
-    color: #f6f0e6;
-    border-radius: 6px;
-    font-weight: 600;
-    text-decoration: none;
+  .chat-textarea {
+    flex: 1;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px; /* pill styling */
+    padding: 12px 20px;
+    color: var(--text-primary);
+    resize: none;
+    min-height: 48px;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-family: inherit;
+    /* transition for smooth grow */
+    transition: min-height 0.2s;
+  }
+  .chat-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  }
+  
+  .file-upload-btn, .send-btn {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  
+  .file-upload-btn {
+    cursor: pointer;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-muted);
+  }
+  .file-upload-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary);
+  }
+  
+  .send-btn {
+    background: var(--accent);
+    color: white;
     border: none;
     cursor: pointer;
   }
+  .send-btn:hover {
+    transform: scale(1.05);
+  }
 
-  .group-actions a {
-    background-color: #444;
+  #imagePreviewContainer {
+    display: none;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .chat-wrapper {
+      flex-direction: column;
+      height: calc(100vh - 80px); /* adjust slightly for mobile headers if needed */
+      margin: 0;
+      border-radius: 0;
+      border: none;
+    }
+    .chat-sidebar {
+      width: 100%;
+      height: auto;
+      max-height: 150px;
+      flex-shrink: 0;
+      border-right: none;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .chat-sidebar-content {
+      display: none; /* Hide members list on mobile to save space */
+    }
   }
 </style>
-{% endblock %}
 
-{% block content %}
-<div class="group-detail-container">
-
-  <!-- ================= HEADER ================= -->
-  <div class="group-header">
-    <h2>{{ group.name }}</h2>
-    {% if group.description %}
-      <p>{{ group.description }}</p>
-    {% endif %}
-  </div>
-
-  <hr>
-
-  <!-- ================= MEMBERS ================= -->
-  <div class="section">
-    <h3>Members ({{ group.members.count }})</h3>
-
-    {% for member in group.members.all %}
-      <span class="member-badge">{{ member.username }}</span>
-    {% empty %}
-      <p>No members yet.</p>
-    {% endfor %}
-  </div>
-
-  <hr>
-
-  <!-- ================= DISCUSSIONS ================= -->
-  <div class="section">
-    <h3>Discussions</h3>
-
-    {% for post in posts %}
-      <div class="post-card">
-        <p>
-          <strong>{{ post.user.username }}</strong>
-          <small>• {{ post.created_at|date:"M d, Y H:i" }}</small>
+<div class="chat-wrapper animate-fade-in">
+  
+  <!-- SIDEBAR -->
+  <div class="chat-sidebar">
+    <div class="chat-sidebar-header">
+      <h2 style="font-size: 1.5rem; margin-bottom: 5px; color: var(--text-primary);">{{ group.name }}</h2>
+      {% if group.description %}
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          {{ group.description }}
         </p>
-        <p>{{ post.content }}</p>
+      {% endif %}
+    </div>
+    
+    <div class="chat-sidebar-content">
+      <h3 style="font-size: 0.95rem; margin-bottom: 15px; color: var(--text-secondary);">
+        <i class="fa-solid fa-users"></i> Members ({{ group.members.count }})
+      </h3>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        {% for member in group.members.all %}
+          <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.03);">
+            <i class="fa-solid fa-circle-user fa-lg" style="color: {% if member == user %}var(--accent){% else %}var(--text-muted){% endif %};"></i>
+            <span style="font-weight: 500; font-size: 0.95rem; color: var(--text-primary);">
+              {{ member.username }}
+              {% if member == user %} <small style="color: var(--text-muted); font-weight: normal;">(You)</small>{% endif %}
+            </span>
+          </div>
+        {% empty %}
+          <p style="color: var(--text-muted); font-style: italic; font-size: 0.9rem;">No members yet.</p>
+        {% endfor %}
       </div>
-    {% empty %}
-      <p>No discussions yet. Be the first to post!</p>
-    {% endfor %}
+    </div>
   </div>
 
-  <hr>
-
-  <!-- ================= POST MESSAGE ================= -->
-  {% if user.is_authenticated %}
-  <div class="section">
-    <h3>Post a Message</h3>
-
-    <form method="post">
-      {% csrf_token %}
-      <textarea name="content" rows="3" placeholder="Write something..." required></textarea>
-
-      <div class="group-actions">
-        <button type="submit">💬 Post Message</button>
-        <a href="{% url 'groups:list' %}">← Back to Groups</a>
+  <!-- MAIN CHAT AREA -->
+  <div class="chat-main">
+    
+    <!-- Header -->
+    <div class="chat-header">
+      <div>
+        <h3 style="margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-regular fa-comments" style="color: var(--accent);"></i> Group Chat
+        </h3>
       </div>
-    </form>
-  </div>
-  {% else %}
-    <p>
-      <a href="{% url 'login' %}">Login</a> to join the discussion.
-    </p>
-  {% endif %}
+      <a href="{% url 'groups:list' %}" class="btn btn-secondary btn-sm" style="padding: 6px 15px; border-radius: 20px;">
+        <i class="fa-solid fa-arrow-left"></i> All Clubs
+      </a>
+    </div>
 
+    <!-- Messages -->
+    <div class="chat-messages" id="chatMessages">
+      {% for post in posts %}
+        <div class="chat-bubble-wrapper {% if post.user == user %}own{% else %}other{% endif %}">
+          <div class="chat-meta">
+            <strong>{{ post.user.username }}</strong>
+            <span>{{ post.created_at|date:"H:i" }}</span>
+          </div>
+          <div class="chat-bubble">
+            {% if post.content %}
+              {{ post.content }}
+            {% endif %}
+            
+            {% if post.image %}
+              <img src="{{ post.image.url }}" alt="Upload" class="chat-image">
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <div class="empty-state" style="margin: auto; text-align: center; color: var(--text-muted);">
+          <i class="fa-regular fa-comments fa-3x" style="margin-bottom: 15px; opacity: 0.5;"></i>
+          <p>No messages yet. Start the conversation!</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+      {% if user.is_authenticated %}
+        
+        <!-- Image Preview Box -->
+        <div id="imagePreviewContainer">
+          <i class="fa-solid fa-image" style="color: var(--accent);"></i>
+          <span id="imageName">Attaching an image...</span>
+          <i class="fa-solid fa-xmark" style="margin-left: auto; cursor: pointer; color: var(--text-muted);" onclick="clearImage()" title="Remove file"></i>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="chat-form">
+          {% csrf_token %}
+          
+          <label class="file-upload-btn" title="Attach Image">
+            <i class="fa-solid fa-paperclip fa-lg"></i>
+            <input type="file" name="image" accept="image/*" style="display: none;" id="imageUpload">
+          </label>
+
+          <textarea name="content" class="chat-textarea" placeholder="Type a message..." required oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+
+          <button type="submit" class="send-btn" title="Send Message">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      {% else %}
+        <div style="text-align: center; padding: 10px; color: var(--text-muted);">
+          <i class="fa-solid fa-lock"></i> <a href="{% url 'login' %}" style="color: var(--accent); font-weight: 500;">Login</a> to join the chat.
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
 </div>
+
+<script>
+  // Auto-scroll to bottom of messages on page load
+  window.onload = function() {
+    scrollToBottom();
+  };
+
+  function scrollToBottom() {
+    var chatMessages = document.getElementById("chatMessages");
+    if (chatMessages) {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }
+
+  // Handle image upload preview and toggle required field
+  const imageUpload = document.getElementById('imageUpload');
+  const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+  const imageName = document.getElementById('imageName');
+  const textarea = document.querySelector('.chat-textarea');
+
+  if (imageUpload) {
+    imageUpload.addEventListener('change', function(e) {
+      if (this.files && this.files[0]) {
+        imageName.textContent = this.files[0].name;
+        imagePreviewContainer.style.display = 'flex';
+        // Remove text requirement since they might just want to send an image
+        textarea.removeAttribute('required');
+      } else {
+        clearImage();
+      }
+    });
+  }
+
+  function clearImage() {
+    imageUpload.value = '';
+    imagePreviewContainer.style.display = 'none';
+    textarea.setAttribute('required', 'required');
+  }
+
+  // Handle submitting with Enter key without shift
+  if (textarea) {
+    textarea.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault(); // Prevent line break
+        
+        // Only submit if text is present or file is attached
+        if (this.value.trim() !== '' || (imageUpload && imageUpload.files.length > 0)) {
+          this.form.submit();
+        }
+      }
+    });
+  }
+</script>
 {% endblock %}
