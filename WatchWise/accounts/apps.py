@@ -5,4 +5,4 @@ class AccountsConfig(AppConfig):
     name = 'WatchWise.accounts'
 
     def ready(self):
-        import accounts.signals
+        import WatchWise.accounts.signals
