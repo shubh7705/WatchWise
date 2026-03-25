@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
-from movies.models import Movie
+from WatchWise.movies.models import Movie
 
 
 class Review(models.Model):
