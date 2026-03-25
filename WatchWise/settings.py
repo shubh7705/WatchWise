@@ -39,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'WatchWise.accounts',
-    'WatchWise.movies',
-    'WatchWise.reviews',
-    'WatchWise.groups',
+    'accounts',
+    'movies',
+    'reviews',
+    'groups',
 ]
 
 MIDDLEWARE = [
