@@ -1,0 +1,550 @@
+// Initial seed data curated from WatchWise dataset and enhanced with trailers, moods, streaming providers, and playlists
+
+export const initialGenres = [
+  { id: 1, tmdb_id: 28, name: "Action" },
+  { id: 2, tmdb_id: 12, name: "Adventure" },
+  { id: 3, tmdb_id: 16, name: "Animation" },
+  { id: 4, tmdb_id: 35, name: "Comedy" },
+  { id: 5, tmdb_id: 80, name: "Crime" },
+  { id: 6, tmdb_id: 99, name: "Documentary" },
+  { id: 7, tmdb_id: 18, name: "Drama" },
+  { id: 8, tmdb_id: 10751, name: "Family" },
+  { id: 9, tmdb_id: 14, name: "Fantasy" },
+  { id: 10, tmdb_id: 36, name: "History" },
+  { id: 11, tmdb_id: 27, name: "Horror" },
+  { id: 12, tmdb_id: 10402, name: "Music" },
+  { id: 13, tmdb_id: 9648, name: "Mystery" },
+  { id: 14, tmdb_id: 10749, name: "Romance" },
+  { id: 15, tmdb_id: 878, name: "Science Fiction" },
+  { id: 16, tmdb_id: 10770, name: "TV Movie" },
+  { id: 17, tmdb_id: 53, name: "Thriller" },
+  { id: 18, tmdb_id: 10752, name: "War" },
+  { id: 19, tmdb_id: 37, name: "Western" }
+];
+
+export const initialUsers = [
+  { id: 2, username: "India", email: "india@watchwise.com", bio: "Proud cinephile exploring world and Indian cinema.", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" },
+  { id: 3, username: "shubham", email: "shubham@watchwise.com", bio: "Director & movie critique. Lover of high-octane thrillers and sci-fi.", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80" },
+  { id: 4, username: "shubh", email: "shubh@watchwise.com", bio: "Founder of WatchWise. Finding cinema gems every day.", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80" },
+  { id: 5, username: "user1", email: "user1@watchwise.com", bio: "Weekend movie binge enthusiast.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" },
+  { id: 6, username: "sanket", email: "sanket@watchwise.com", bio: "Passionate about drama, heart-touching stories and cinematography.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" }
+];
+
+export const initialMovies = [
+  {
+    id: 14,
+    title: "War",
+    overview: "Khalid, entrusted with the task of eliminating former soldier turned rogue Kabir, engages in an epic battle with his mentor who taught him everything.",
+    release_year: 2019,
+    language: "Hindi",
+    poster: "https://image.tmdb.org/t/p/w500/yUtaHkL2SDIAZhRApZAyQrAXygn.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/yUtaHkL2SDIAZhRApZAyQrAXygn.jpg",
+    duration_minutes: 152,
+    created_by: 3,
+    created_at: "2025-12-18T08:03:04.986Z",
+    genres: [1, 2, 17],
+    featured: true,
+    tagline: "Two lethal agents. One brutal showdown.",
+    trailer_url: "https://www.youtube.com/watch?v=tQ0mzXRk-oI",
+    streaming_on: ["Prime Video"],
+    mood_tags: ["adrenaline", "mind-bending", "popcorn"]
+  },
+  {
+    id: 15,
+    title: "War 2",
+    overview: "Years ago Agent Kabir went rogue, became India's greatest villain ever. As he descends further into the deepest shadows... India sends its deadliest, most lethal agent after him, Agent Vikram. A Special Units Officer who is more than Kabir's equal.",
+    release_year: 2025,
+    language: "Hindi",
+    poster: "https://image.tmdb.org/t/p/w500/2Yc8Kl2ldPpDzLrG2M5Ddv62FXB.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/2Yc8Kl2ldPpDzLrG2M5Ddv62FXB.jpg",
+    duration_minutes: 173,
+    created_by: 3,
+    created_at: "2025-12-18T08:03:27.108Z",
+    genres: [1, 2, 17],
+    featured: true,
+    tagline: "The spy universe expands into chaos.",
+    trailer_url: "https://www.youtube.com/watch?v=tQ0mzXRk-oI",
+    streaming_on: ["Theatres", "Prime Video"],
+    mood_tags: ["adrenaline", "popcorn"]
+  },
+  {
+    id: 16,
+    title: "Jawan",
+    overview: "An emotional journey of a prison warden, driven by a personal vendetta while keeping up to a promise made years ago, recruits inmates to commit outrageous crimes that shed light on corruption and injustice.",
+    release_year: 2023,
+    language: "Hindi",
+    poster: "https://image.tmdb.org/t/p/w500/jFt1gS4BGHlK8xt76Y81Alp4dbt.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/jFt1gS4BGHlK8xt76Y81Alp4dbt.jpg",
+    duration_minutes: 169,
+    created_by: 2,
+    created_at: "2025-12-18T08:08:58.116Z",
+    genres: [1, 5, 17],
+    featured: true,
+    tagline: "Ready or not, here comes the revolution.",
+    trailer_url: "https://www.youtube.com/watch?v=COv52Qyctws",
+    streaming_on: ["Netflix"],
+    mood_tags: ["adrenaline", "emotional", "popcorn"]
+  },
+  {
+    id: 17,
+    title: "Om Shanti Om",
+    overview: "Reincarnated 30 years after being killed in a suspicious on-set fire, a small-time actor is determined to punish the person who ignited the blaze and reunite with his lost love.",
+    release_year: 2007,
+    language: "Hindi",
+    poster: "https://image.tmdb.org/t/p/w500/oArsQTD4bPPMtRjqr03SO9W6phF.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/oArsQTD4bPPMtRjqr03SO9W6phF.jpg",
+    duration_minutes: 169,
+    created_by: 2,
+    created_at: "2025-12-18T08:10:21.537Z",
+    genres: [4, 7, 17],
+    featured: false,
+    tagline: "Picture abhi baaki hai mere dost.",
+    trailer_url: "https://www.youtube.com/watch?v=9oeGoQGt7m8",
+    streaming_on: ["Netflix", "Prime Video"],
+    mood_tags: ["popcorn", "romantic", "masterpiece"]
+  },
+  {
+    id: 18,
+    title: "Tere Ishq Mein",
+    overview: "A psychology student attempts to rehabilitate a volatile young man, before evolving into a doomed intense romance that defies social barriers.",
+    release_year: 2025,
+    language: "Hindi",
+    poster: "https://image.tmdb.org/t/p/w500/7FsHlW9z7gDhDE4EXAE2WcXUVQj.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/7FsHlW9z7gDhDE4EXAE2WcXUVQj.jpg",
+    duration_minutes: 167,
+    created_by: 2,
+    created_at: "2025-12-18T08:10:48.519Z",
+    genres: [1, 7, 14],
+    featured: false,
+    tagline: "Love without boundaries or mercy.",
+    trailer_url: "https://www.youtube.com/watch?v=hXzcx6P232A",
+    streaming_on: ["Theatres"],
+    mood_tags: ["romantic", "emotional"]
+  },
+  {
+    id: 19,
+    title: "Sita Ramam",
+    overview: "Afreen, a rebellious student in London, is tasked with delivering a letter written by Lieutenant Ram to Sita Mahalakshmi 20 years ago. As Afreen unravels Ram's forgotten sacrifice, her life transforms.",
+    release_year: 2022,
+    language: "Telugu",
+    poster: "https://image.tmdb.org/t/p/w500/g3hk2wEeIsTGhh7JvK8yWFVR7ue.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/g3hk2wEeIsTGhh7JvK8yWFVR7ue.jpg",
+    duration_minutes: 158,
+    created_by: 2,
+    created_at: "2025-12-18T08:11:11.769Z",
+    genres: [7, 10, 14],
+    featured: false,
+    tagline: "An immortal love story from the frontlines of war.",
+    trailer_url: "https://www.youtube.com/watch?v=kYvW_j0qN8w",
+    streaming_on: ["Prime Video", "Disney+ Hotstar"],
+    mood_tags: ["emotional", "romantic", "masterpiece"]
+  },
+  {
+    id: 20,
+    title: "Animal",
+    overview: "The hardened son of a powerful industrialist returns home after years abroad and vows to take bloody revenge on those threatening his father's life, descending into obsession and fury.",
+    release_year: 2023,
+    language: "Hindi",
+    poster: "https://image.tmdb.org/t/p/w500/hr9rjR3J0xBBKmlJ4n3gHId9ccx.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/hr9rjR3J0xBBKmlJ4n3gHId9ccx.jpg",
+    duration_minutes: 201,
+    created_by: 2,
+    created_at: "2025-12-18T08:11:27.824Z",
+    genres: [1, 5, 7],
+    featured: false,
+    tagline: "A son's primal rage knowing no limit.",
+    trailer_url: "https://www.youtube.com/watch?v=Dydmpfo68DA",
+    streaming_on: ["Netflix"],
+    mood_tags: ["adrenaline", "dark", "mind-bending"]
+  },
+  {
+    id: 21,
+    title: "Dhurandar",
+    overview: "An Indian intelligence mission unfolds over ten years as an undercover agent enters Karachi's criminal and political world to dismantle dangerous cross-border terror networks.",
+    release_year: 2025,
+    language: "Hindi",
+    poster: "https://image.tmdb.org/t/p/w500/8FHOtUpNIk5ZPEay2N2EY5lrxkv.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/8FHOtUpNIk5ZPEay2N2EY5lrxkv.jpg",
+    duration_minutes: 214,
+    created_by: 2,
+    created_at: "2025-12-18T08:11:41.595Z",
+    genres: [1, 17],
+    featured: false,
+    tagline: "Deep cover. Zero backup. Infinite stakes.",
+    trailer_url: "https://www.youtube.com/watch?v=tQ0mzXRk-oI",
+    streaming_on: ["Theatres"],
+    mood_tags: ["adrenaline", "dark"]
+  },
+  {
+    id: 22,
+    title: "The Avengers",
+    overview: "When an unexpected enemy emerges and threatens global safety and security, Nick Fury, director of S.H.I.E.L.D., initiates the Avengers protocol to assemble Earth's mightiest heroes.",
+    release_year: 2012,
+    language: "English",
+    poster: "https://image.tmdb.org/t/p/w500/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg",
+    duration_minutes: 143,
+    created_by: 2,
+    created_at: "2025-12-18T08:11:54.562Z",
+    genres: [1, 2, 15],
+    featured: false,
+    tagline: "Earth's Mightiest Heroes assemble.",
+    trailer_url: "https://www.youtube.com/watch?v=eOrNdBpGMv8",
+    streaming_on: ["Disney+ Hotstar"],
+    mood_tags: ["adrenaline", "popcorn", "masterpiece"]
+  },
+  {
+    id: 23,
+    title: "Chaava",
+    overview: "Shivaji's death sparks the Maratha-Mughal conflict. His son Chhatrapati Sambhaji Maharaj leads fearless resistance against Aurangzeb's vast forces in an epic struggle for freedom.",
+    release_year: 2025,
+    language: "Hindi",
+    poster: "https://image.tmdb.org/t/p/w500/wkI6B0xQCSLAcS9N5oDWPeAqeXL.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/wkI6B0xQCSLAcS9N5oDWPeAqeXL.jpg",
+    duration_minutes: 161,
+    created_by: 2,
+    created_at: "2025-12-18T08:12:07.697Z",
+    genres: [1, 7, 10],
+    featured: true,
+    tagline: "The Lion of Swarajya.",
+    trailer_url: "https://www.youtube.com/watch?v=V7LwfY5U5WI",
+    streaming_on: ["Theatres", "Prime Video"],
+    mood_tags: ["adrenaline", "emotional", "masterpiece"]
+  },
+  {
+    id: 24,
+    title: "Titanic",
+    overview: "101-year-old Rose DeWitt Bukater tells the story of her life aboard the Titanic. Jack Dawson and Rose meet and fall deeply in love on the fateful maiden voyage of the RMS Titanic.",
+    release_year: 1997,
+    language: "English",
+    poster: "https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
+    duration_minutes: 194,
+    created_by: 2,
+    created_at: "2025-12-18T08:12:26.156Z",
+    genres: [7, 14],
+    featured: false,
+    tagline: "Nothing on Earth could come between them.",
+    trailer_url: "https://www.youtube.com/watch?v=I7c1etV7DCo",
+    streaming_on: ["Disney+ Hotstar", "Apple TV"],
+    mood_tags: ["emotional", "romantic", "masterpiece"]
+  },
+  {
+    id: 25,
+    title: "Parasite",
+    overview: "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.",
+    release_year: 2019,
+    language: "Korean",
+    poster: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    duration_minutes: 132,
+    created_by: 2,
+    created_at: "2025-12-18T08:12:49.875Z",
+    genres: [4, 7, 17],
+    featured: false,
+    tagline: "Act like you own the place.",
+    trailer_url: "https://www.youtube.com/watch?v=5xH0RzeSojI",
+    streaming_on: ["Prime Video", "Apple TV"],
+    mood_tags: ["mind-bending", "dark", "masterpiece"]
+  },
+  {
+    id: 26,
+    title: "Thamma",
+    overview: "Two destined lovers battle supernatural forces, family ties, and nature itself to defend their forbidden romance in a mystical world where ancient powers awaken.",
+    release_year: 2025,
+    language: "Hindi",
+    poster: "https://image.tmdb.org/t/p/w500/udkbDwBbysCGEydt0FHnl9dVO2k.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/udkbDwBbysCGEydt0FHnl9dVO2k.jpg",
+    duration_minutes: 149,
+    created_by: 5,
+    created_at: "2025-12-19T02:23:47.344Z",
+    genres: [4, 11],
+    featured: false,
+    tagline: "Spooky love in the horror universe.",
+    trailer_url: "https://www.youtube.com/watch?v=3u_YV84o0o0",
+    streaming_on: ["Theatres"],
+    mood_tags: ["dark", "popcorn"]
+  },
+  {
+    id: 27,
+    title: "Spider-Man",
+    overview: "After being bitten by a genetically altered spider at Oscorp, nerdy high school student Peter Parker is endowed with amazing superpowers and discovers that with great power comes great responsibility.",
+    release_year: 2002,
+    language: "English",
+    poster: "https://image.tmdb.org/t/p/w500/gh4c2Fr07jhOoRv0POW2Gu3ve89.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/gh4c2Fr07jhOoRv0POW2Gu3ve89.jpg",
+    duration_minutes: 121,
+    created_by: 5,
+    created_at: "2026-01-10T17:06:07.556Z",
+    genres: [1, 15],
+    featured: false,
+    tagline: "With great power comes great responsibility.",
+    trailer_url: "https://www.youtube.com/watch?v=t06RUxPbp_c",
+    streaming_on: ["Netflix", "Disney+ Hotstar"],
+    mood_tags: ["adrenaline", "popcorn", "masterpiece"]
+  },
+  {
+    id: 28,
+    title: "300",
+    overview: "King Leonidas of Sparta leads 300 brave warriors into battle against the gargantuan invading Persian army commanded by King Xerxes at the Pass of Thermopylae.",
+    release_year: 2007,
+    language: "English",
+    poster: "https://image.tmdb.org/t/p/w500/h7Lcio0c9ohxPhSZg42eTlKIVVY.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/h7Lcio0c9ohxPhSZg42eTlKIVVY.jpg",
+    duration_minutes: 116,
+    created_by: 5,
+    created_at: "2026-02-02T15:38:41.215Z",
+    genres: [1, 2, 18],
+    featured: false,
+    tagline: "Prepare for glory!",
+    trailer_url: "https://www.youtube.com/watch?v=UrIbxk7idYA",
+    streaming_on: ["Prime Video", "Apple TV"],
+    mood_tags: ["adrenaline", "masterpiece"]
+  },
+  {
+    id: 29,
+    title: "Hi Nanna",
+    overview: "Six-year-old Mahi, a spirited child with cystic fibrosis, shares a deep yet complex bond with her father Viraj. A chance encounter with a kind woman named Yashna sparks unexpected revelations.",
+    release_year: 2023,
+    language: "Telugu",
+    poster: "https://image.tmdb.org/t/p/w500/hhMLtq9m1aK0dpY9Wcq26XeDH2z.jpg",
+    backdrop: "https://image.tmdb.org/t/p/original/hhMLtq9m1aK0dpY9Wcq26XeDH2z.jpg",
+    duration_minutes: 155,
+    created_by: 6,
+    created_at: "2026-03-23T18:11:54.632Z",
+    genres: [7, 8, 14],
+    featured: false,
+    tagline: "A heartwarming tale of love, family, and destiny.",
+    trailer_url: "https://www.youtube.com/watch?v=0k6Z3F1uYgE",
+    streaming_on: ["Netflix"],
+    mood_tags: ["emotional", "romantic", "masterpiece"]
+  }
+];
+
+export const initialReviews = [
+  {
+    id: 1,
+    user_id: 2,
+    username: "India",
+    movie_id: 24,
+    rating: 5,
+    rating_label: "Perfection",
+    review_text: "A timeless masterpiece of storytelling and emotions. The climax scene on the iceberg will forever break hearts.",
+    contains_spoiler: false,
+    created_at: "2025-12-18T12:46:48.251Z"
+  },
+  {
+    id: 2,
+    user_id: 2,
+    username: "India",
+    movie_id: 21,
+    rating: 5,
+    rating_label: "Perfection",
+    review_text: "Major spoiler: When the undercover agent finally turns out to be working for double intelligence, the whole theater gasped!",
+    contains_spoiler: true,
+    created_at: "2025-12-18T14:06:55.041Z"
+  },
+  {
+    id: 3,
+    user_id: 5,
+    username: "user1",
+    movie_id: 21,
+    rating: 4,
+    rating_label: "Must Watch",
+    review_text: "There are no words, it's virtually perfect edge-of-the-seat action.",
+    contains_spoiler: false,
+    created_at: "2025-12-18T14:09:28.017Z"
+  },
+  {
+    id: 4,
+    user_id: 5,
+    username: "user1",
+    movie_id: 26,
+    rating: 3,
+    rating_label: "Go For It",
+    review_text: "Fun horror comedy with solid folklore references.",
+    contains_spoiler: false,
+    created_at: "2025-12-19T02:24:19.311Z"
+  },
+  {
+    id: 5,
+    user_id: 2,
+    username: "India",
+    movie_id: 26,
+    rating: 5,
+    rating_label: "Perfection",
+    review_text: "Exceeded my expectations, great chemistry and background score!",
+    contains_spoiler: false,
+    created_at: "2025-12-19T08:20:13.263Z"
+  },
+  {
+    id: 6,
+    user_id: 6,
+    username: "sanket",
+    movie_id: 29,
+    rating: 4,
+    rating_label: "Must Watch",
+    review_text: "Extremely touching performance by Nani and Mrunal. Bring tissues for the hospital revelation!",
+    contains_spoiler: true,
+    created_at: "2026-03-23T18:12:41.033Z"
+  },
+  {
+    id: 7,
+    user_id: 3,
+    username: "shubham",
+    movie_id: 16,
+    rating: 5,
+    rating_label: "Perfection",
+    review_text: "Mass cinema redefined. Atlee and SRK delivered pure entertainment.",
+    contains_spoiler: false,
+    created_at: "2026-01-05T11:20:00.000Z"
+  },
+  {
+    id: 8,
+    user_id: 4,
+    username: "shubh",
+    movie_id: 23,
+    rating: 5,
+    rating_label: "Perfection",
+    review_text: "Vicky Kaushal's performance is monumental. Incredible historical tribute.",
+    contains_spoiler: false,
+    created_at: "2026-02-14T09:15:00.000Z"
+  }
+];
+
+export const initialWatchHistory = [
+  { user_id: 4, movie_id: 14, watched_at: "2026-03-20T10:00:00.000Z" },
+  { user_id: 4, movie_id: 16, watched_at: "2026-03-22T14:30:00.000Z" },
+  { user_id: 4, movie_id: 23, watched_at: "2026-03-25T18:00:00.000Z" },
+  { user_id: 4, movie_id: 29, watched_at: "2026-03-28T21:10:00.000Z" },
+  { user_id: 3, movie_id: 16, watched_at: "2026-01-05T11:00:00.000Z" },
+  { user_id: 2, movie_id: 24, watched_at: "2025-12-18T12:00:00.000Z" },
+  { user_id: 2, movie_id: 21, watched_at: "2025-12-18T14:00:00.000Z" },
+  { user_id: 6, movie_id: 29, watched_at: "2026-03-23T18:00:00.000Z" }
+];
+
+export const initialClubs = [
+  {
+    id: 1,
+    name: "Indian Cinema Enthusiasts",
+    description: "A sanctuary for lovers of Bollywood, Tollywood, Kollywood, Mollywood and beyond. Discuss upcoming blockbusters, iconic classics, and music albums.",
+    banner: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=1200&q=80",
+    created_by: 2,
+    created_by_name: "India",
+    members_count: 342,
+    created_at: "2025-12-22T07:06:55.405Z",
+    members: [2, 3, 4, 5, 6],
+    posts: [
+      {
+        id: 1,
+        user_id: 2,
+        username: "India",
+        user_avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+        content: "What are your highest expectations for the upcoming spy universe films? The crossover possibilities with Kabir and Pathaan are immense!",
+        image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+        likes: 18,
+        created_at: "2026-03-20T10:15:00.000Z",
+        comments: [
+          { id: 101, username: "shubh", content: "Agreed! The BGM direction is going to be epic.", created_at: "2026-03-20T11:00:00.000Z" },
+          { id: 102, username: "user1", content: "Can't wait to see the action set-pieces.", created_at: "2026-03-20T11:45:00.000Z" }
+        ]
+      },
+      {
+        id: 2,
+        user_id: 5,
+        username: "user1",
+        user_avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80",
+        content: "Rewatched Sita Ramam last night and that letter twist still gives goosebumps every single time.",
+        image: null,
+        likes: 24,
+        created_at: "2026-03-24T16:20:00.000Z",
+        comments: [
+          { id: 103, username: "sanket", content: "One of the best modern romance soundtracks ever composed.", created_at: "2026-03-24T17:10:00.000Z" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 2,
+    name: "Sci-Fi & Cyberpunk Realm",
+    description: "Exploring dystopian futures, time travel paradoxes, AI sentience, and cosmic space operas from Interstellar to Matrix and Blade Runner.",
+    banner: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1200&q=80",
+    created_by: 3,
+    created_by_name: "shubham",
+    members_count: 519,
+    created_at: "2026-01-10T14:30:00.000Z",
+    members: [3, 4, 6],
+    posts: [
+      {
+        id: 3,
+        user_id: 3,
+        username: "shubham",
+        user_avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80",
+        content: "What makes a sci-fi film truly timeless for you: hard scientific grounding or deep philosophical dilemmas?",
+        image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+        likes: 31,
+        created_at: "2026-03-26T09:00:00.000Z",
+        comments: [
+          { id: 104, username: "shubh", content: "Philosophical dilemmas for sure! The human element always anchors it.", created_at: "2026-03-26T09:30:00.000Z" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 3,
+    name: "Cinema Buffs & Masterpieces",
+    description: "Deep-dives into cinematography, directorial trademarks, screenwriting techniques, and Oscar contenders.",
+    banner: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?auto=format&fit=crop&w=1200&q=80",
+    created_by: 4,
+    created_by_name: "shubh",
+    members_count: 880,
+    created_at: "2025-12-15T09:00:00.000Z",
+    members: [2, 3, 4, 5, 6],
+    posts: [
+      {
+        id: 4,
+        user_id: 4,
+        username: "shubh",
+        user_avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80",
+        content: "Welcome to WatchWise Clubs! Share your favorite movies, rate newly released titles, and connect with fellow cinephiles.",
+        image: null,
+        likes: 45,
+        created_at: "2026-03-27T08:00:00.000Z",
+        comments: []
+      }
+    ]
+  }
+];
+
+export const initialPlaylists = [
+  {
+    id: 1,
+    title: "High-Octane Spy & Action Universe",
+    description: "Heart-pounding car chases, tactical covert operations, and iconic showdowns.",
+    cover: "https://image.tmdb.org/t/p/w500/yUtaHkL2SDIAZhRApZAyQrAXygn.jpg",
+    created_by: 4,
+    created_by_name: "shubh",
+    movies: [14, 15, 16, 21],
+    created_at: "2026-02-10T10:00:00.000Z"
+  },
+  {
+    id: 2,
+    title: "Tearjerker Romance & Unforgettable Love",
+    description: "Emotional masterpieces that leave an indelible mark on your soul.",
+    cover: "https://image.tmdb.org/t/p/w500/g3hk2wEeIsTGhh7JvK8yWFVR7ue.jpg",
+    created_by: 2,
+    created_by_name: "India",
+    movies: [19, 24, 29, 18],
+    created_at: "2026-02-18T14:30:00.000Z"
+  },
+  {
+    id: 3,
+    title: "Mind-Bending & Oscar Winners",
+    description: "Films with revolutionary storytelling, layered themes, and jaw-dropping twists.",
+    cover: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    created_by: 3,
+    created_by_name: "shubham",
+    movies: [25, 23, 22, 28],
+    created_at: "2026-03-01T09:15:00.000Z"
+  }
+];

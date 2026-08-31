@@ -4,11 +4,9 @@ WatchWise is a Django-based movie recommendation and community platform where us
 
 ## 🛠 Technologies Used
 
-* Python
-* Django
-* HTML
-* CSS
-* SQLite
+* **Frontend:** React.js, Vite, Lucide Icons, Canvas Confetti, Modern CSS Design System (Glassmorphism & Cinema Dark/Light themes)
+* **Backend:** Python, Django, SQLite / PostgreSQL
+* **External APIs:** The Movie Database (TMDb) API Integration
 
 ## ✨ Features
 
@@ -52,7 +50,10 @@ WatchWise is a Django-based movie recommendation and community platform where us
 git clone https://github.com/shubh7705/watchwise.git
 
 cd watchwise
+```
 
+### 1. Backend (Django)
+```bash
 python -m venv venv
 
 # Windows
@@ -62,11 +63,17 @@ venv\Scripts\activate
 source venv/bin/activate
 
 pip install -r requirements.txt
-
 python manage.py migrate
-
 python manage.py runserver
 ```
+
+### 2. Frontend (React + Vite)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open **`http://localhost:5173`** in your browser.
 
 ## 🌐 Live Demo
 
