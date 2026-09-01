@@ -16,6 +16,24 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
   const [selectedGenres, setSelectedGenres] = useState([1, 17]);
   const [isFetchingTmdb, setIsFetchingTmdb] = useState(false);
 
+  const resetForm = () => {
+    setTitle('');
+    setReleaseYear('');
+    setOverview('');
+    setLanguage('Hindi');
+    setDurationMinutes(135);
+    setPoster('');
+    setBackdrop('');
+    setTagline('');
+    setSelectedGenres([1, 17]);
+    setIsFetchingTmdb(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   const handleTmdbAutofill = async () => {
@@ -94,13 +112,14 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
     });
 
     if (newMovie) {
+      resetForm();
       onMovieAdded(newMovie.id);
       onClose();
     }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={handleClose}>
       <div
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
@@ -117,7 +136,7 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
             </p>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="btn btn-secondary"
             style={{ width: '36px', height: '36px', padding: 0, borderRadius: '50%' }}
           >
@@ -327,7 +346,7 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
 
           {/* Submit Actions */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-            <button type="button" onClick={onClose} className="btn btn-secondary">
+            <button type="button" onClick={handleClose} className="btn btn-secondary">
               Cancel
             </button>
             <button type="submit" className="btn btn-primary">
