@@ -414,3 +414,28 @@ def api_users_list(request):
         for u in users
     ]
     return JsonResponse({"users": data}, safe=False)
+
+
+# ==========================================
+# TMDB PROXY API
+# ==========================================
+
+def api_tmdb_search(request):
+    """
+    Search TMDb for movie metadata, poster, backdrop, runtime, and genres.
+    Usage: /api/tmdb/search/?title=Inception&year=2010
+    """
+    from .tmdb import fetch_movie_data
+
+    title = request.GET.get("title", "").strip()
+    year = request.GET.get("year", "").strip()
+
+    if not title:
+        return JsonResponse({"error": "Title parameter is required"}, status=400)
+
+    movie_data = fetch_movie_data(title, year if year else None)
+    if not movie_data:
+        return JsonResponse({"error": "Movie not found on TMDb"}, status=404)
+
+    return JsonResponse(movie_data)
+

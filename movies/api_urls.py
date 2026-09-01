@@ -25,4 +25,7 @@ urlpatterns = [
 
     # Auth
     path("auth/users/", api_views.api_users_list, name="api_users_list"),
+
+    # TMDb Search Proxy
+    path("tmdb/search/", api_views.api_tmdb_search, name="api_tmdb_search"),
 ]
