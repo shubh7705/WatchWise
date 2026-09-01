@@ -6,10 +6,10 @@ from groups.models import Group, GroupPost, GroupComment
 
 
 class Command(BaseCommand):
-    help = "Seed the WatchWise SQLite database with initial movies, genres, reviews, playlists, and clubs using official TMDb image URLs"
+    help = "Seed the WatchWise SQLite database with initial movies, genres, reviews, playlists, and clubs using official TMDb metadata"
 
     def handle(self, *args, **options):
-        self.stdout.write("Seeding database with official TMDb poster URLs...")
+        self.stdout.write("Seeding database with official TMDb metadata & scores...")
 
         # 1. Users
         users_data = [
@@ -52,15 +52,21 @@ class Command(BaseCommand):
             g, _ = Genre.objects.get_or_create(name=name, defaults={"tmdb_id": tmdb_id})
             genre_objs[name] = g
 
-        # 3. Movies with official TMDb image URLs
+        # 3. Movies with rich TMDb data
         movies_data = [
             {
                 "title": "War",
+                "original_title": "वार",
+                "original_language": "hi",
                 "tagline": "Two lethal agents. One brutal showdown.",
                 "overview": "Khalid, entrusted with the task of eliminating former soldier turned rogue Kabir, engages in an epic battle with his mentor who taught him everything.",
                 "release_year": 2019,
+                "release_date": "2019-10-02",
                 "language": "Hindi",
                 "duration_minutes": 152,
+                "vote_average": 6.8,
+                "vote_count": 210,
+                "popularity": 48.5,
                 "poster": "https://image.tmdb.org/t/p/w500/yUtaHkL2SDIAZhRApZAyQrAXygn.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/yUtaHkL2SDIAZhRApZAyQrAXygn.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=tQ0mzXRk-oI",
@@ -72,11 +78,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "War 2",
+                "original_title": "वार 2",
+                "original_language": "hi",
                 "tagline": "The spy universe expands into chaos.",
                 "overview": "Major Kabir Dhaliwal faces off against an elusive, highly skilled rogue operative across exotic global terrains in a high-stakes espionage battle of wits and raw power.",
                 "release_year": 2025,
+                "release_date": "2025-08-14",
                 "language": "Hindi",
                 "duration_minutes": 164,
+                "vote_average": 7.5,
+                "vote_count": 85,
+                "popularity": 89.2,
                 "poster": "https://image.tmdb.org/t/p/w500/2Yc8Kl2ldPpDzLrG2M5Ddv62FXB.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/2Yc8Kl2ldPpDzLrG2M5Ddv62FXB.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=tQ0mzXRk-oI",
@@ -88,11 +100,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "Dhurandar",
+                "original_title": "धुरंधर",
+                "original_language": "hi",
                 "tagline": "Deep cover. Zero backup. Infinite stakes.",
                 "overview": "An Indian intelligence mission unfolds over ten years as an undercover agent enters Karachi's criminal and political world to dismantle dangerous cross-border terror networks.",
                 "release_year": 2025,
+                "release_date": "2025-10-02",
                 "language": "Hindi",
                 "duration_minutes": 158,
+                "vote_average": 7.2,
+                "vote_count": 64,
+                "popularity": 72.8,
                 "poster": "https://image.tmdb.org/t/p/w500/8FHOtUpNIk5ZPEay2N2EY5lrxkv.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/8FHOtUpNIk5ZPEay2N2EY5lrxkv.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=YoHD9XEInc0",
@@ -104,11 +122,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "Jawan",
+                "original_title": "जवान",
+                "original_language": "hi",
                 "tagline": "Ready or not, here comes the revolution.",
                 "overview": "A driven man on a personal vendetta rectifies social corruption through explosive, theatrical heists while keeping a deep emotional promise from his past.",
                 "release_year": 2023,
+                "release_date": "2023-09-07",
                 "language": "Hindi",
                 "duration_minutes": 169,
+                "vote_average": 7.3,
+                "vote_count": 298,
+                "popularity": 95.4,
                 "poster": "https://image.tmdb.org/t/p/w500/jFt1gS4BGHlK8xt76Y81Alp4dbt.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/jFt1gS4BGHlK8xt76Y81Alp4dbt.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=COv52Qyctws",
@@ -120,11 +144,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "Interstellar",
+                "original_title": "Interstellar",
+                "original_language": "en",
                 "tagline": "Mankind was born on Earth. It was never meant to die here.",
                 "overview": "A team of intrepid explorers undertake the most monumental mission in human history: traveling beyond our galaxy through a wormhole to discover whether humanity has a future among the stars.",
                 "release_year": 2014,
+                "release_date": "2014-11-05",
                 "language": "English",
                 "duration_minutes": 169,
+                "vote_average": 8.4,
+                "vote_count": 35200,
+                "popularity": 182.6,
                 "poster": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/xJHokMbljvjADYdit5fK5VQsXEG.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=zSWdZVtXT7E",
@@ -136,11 +166,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "Om Shanti Om",
+                "original_title": "ओम शांति ओम",
+                "original_language": "hi",
                 "tagline": "Picture abhi baaki hai mere dost.",
                 "overview": "In the vibrant 1970s, junior artist Om falls hopelessly in love with superstar Shantipriya. After a tragic death, he is reincarnated in the present day to avenge her murder and fulfill their destiny.",
                 "release_year": 2007,
+                "release_date": "2007-11-09",
                 "language": "Hindi",
                 "duration_minutes": 162,
+                "vote_average": 7.1,
+                "vote_count": 340,
+                "popularity": 42.1,
                 "poster": "https://image.tmdb.org/t/p/w500/oArsQTD4bPPMtRjqr03SO9W6phF.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/oArsQTD4bPPMtRjqr03SO9W6phF.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=1V_xTqIA6-U",
@@ -152,11 +188,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "Sita Ramam",
+                "original_title": "సీతా రామం",
+                "original_language": "te",
                 "tagline": "An immortal love story from the frontlines of war.",
                 "overview": "Lieutenant Ram, an orphaned army officer serving at the Kashmir border, receives an anonymous letter from a woman named Sita Mahalakshmi, igniting an unforgettable love story.",
                 "release_year": 2022,
+                "release_date": "2022-08-05",
                 "language": "Telugu",
                 "duration_minutes": 163,
+                "vote_average": 8.0,
+                "vote_count": 182,
+                "popularity": 38.4,
                 "poster": "https://image.tmdb.org/t/p/w500/g3hk2wEeIsTGhh7JvK8yWFVR7ue.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/g3hk2wEeIsTGhh7JvK8yWFVR7ue.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=F0O2d_L6aeg",
@@ -168,11 +210,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "Inception",
+                "original_title": "Inception",
+                "original_language": "en",
                 "tagline": "Your mind is the scene of the crime.",
                 "overview": "A skilled thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO.",
                 "release_year": 2010,
+                "release_date": "2010-07-15",
                 "language": "English",
                 "duration_minutes": 148,
+                "vote_average": 8.4,
+                "vote_count": 36100,
+                "popularity": 145.8,
                 "poster": "https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=YoHD9XEInc0",
@@ -184,14 +232,19 @@ class Command(BaseCommand):
             },
             {
                 "title": "The Avengers",
+                "original_title": "The Avengers",
+                "original_language": "en",
                 "tagline": "Earth's Mightiest Heroes assemble.",
                 "overview": "When an unexpected enemy emerges and threatens global safety and security, Nick Fury, director of S.H.I.E.L.D., initiates the Avengers protocol to assemble Earth's mightiest heroes.",
                 "release_year": 2012,
+                "release_date": "2012-04-25",
                 "language": "English",
                 "duration_minutes": 143,
+                "vote_average": 7.7,
+                "vote_count": 29800,
+                "popularity": 112.5,
                 "poster": "https://image.tmdb.org/t/p/w500/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg",
-                "duration_minutes": 143,
                 "trailer_url": "https://www.youtube.com/watch?v=eOrNdBpGMv8",
                 "streaming_on": ["Disney+ Hotstar"],
                 "mood_tags": ["adrenaline", "popcorn", "masterpiece"],
@@ -201,11 +254,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "Titanic",
+                "original_title": "Titanic",
+                "original_language": "en",
                 "tagline": "Nothing on Earth could come between them.",
                 "overview": "101-year-old Rose DeWitt Bukater tells the story of her life aboard the Titanic. Jack Dawson and Rose meet and fall deeply in love on the fateful maiden voyage of the RMS Titanic.",
                 "release_year": 1997,
+                "release_date": "1997-11-18",
                 "language": "English",
                 "duration_minutes": 194,
+                "vote_average": 7.9,
+                "vote_count": 24700,
+                "popularity": 134.2,
                 "poster": "https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=I7c1etV7DCo",
@@ -217,11 +276,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "Parasite",
+                "original_title": "기생충",
+                "original_language": "ko",
                 "tagline": "Act like you own the place.",
                 "overview": "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan.",
                 "release_year": 2019,
+                "release_date": "2019-05-30",
                 "language": "Korean",
                 "duration_minutes": 132,
+                "vote_average": 8.5,
+                "vote_count": 17800,
+                "popularity": 98.7,
                 "poster": "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=5xH0RzeSojI",
@@ -233,11 +298,17 @@ class Command(BaseCommand):
             },
             {
                 "title": "Spider-Man",
+                "original_title": "Spider-Man",
+                "original_language": "en",
                 "tagline": "With great power comes great responsibility.",
                 "overview": "After being bitten by a genetically altered spider at Oscorp, nerdy high school student Peter Parker is endowed with amazing superpowers and discovers that with great power comes great responsibility.",
                 "release_year": 2002,
+                "release_date": "2002-05-01",
                 "language": "English",
                 "duration_minutes": 121,
+                "vote_average": 7.3,
+                "vote_count": 18400,
+                "popularity": 105.1,
                 "poster": "https://image.tmdb.org/t/p/w500/gh4c2Fr07jhOoRv0POW2Gu3ve89.jpg",
                 "backdrop": "https://image.tmdb.org/t/p/original/gh4c2Fr07jhOoRv0POW2Gu3ve89.jpg",
                 "trailer_url": "https://www.youtube.com/watch?v=t06RUxPbp_c",
@@ -362,4 +433,4 @@ class Command(BaseCommand):
                     content="Definitely checking out the new trailers and reviews here!"
                 )
 
-        self.stdout.write(self.style.SUCCESS("Successfully seeded WatchWise SQLite database with official TMDb posters!"))
+        self.stdout.write(self.style.SUCCESS("Successfully seeded WatchWise SQLite database with official TMDb metadata & scores!"))

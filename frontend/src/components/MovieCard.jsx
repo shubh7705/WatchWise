@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { Star, Clock, Calendar, Bookmark, BookmarkCheck, Play, ListPlus } from 'lucide-react';
+import { Star, Clock, Calendar, Bookmark, BookmarkCheck, ListPlus, Flame } from 'lucide-react';
 import { useMovies } from '../context/MovieContext';
 
 export const MovieCard = ({ movie, onSelectMovie }) => {
-  const { genres, isWatched, toggleWatch, getMovieRatingStats, openTrailer, openAddToPlaylist } = useMovies();
+  const { genres, isWatched, toggleWatch, getMovieRatingStats, openAddToPlaylist } = useMovies();
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const watched = isWatched(movie.id);
   const ratingStats = getMovieRatingStats(movie.id);
   const primaryGenre = movie.genres?.length ? genres.find(g => g.id === movie.genres[0])?.name : null;
   const primaryProvider = movie.streaming_on?.[0];
+  const tmdbScore = movie.vote_average || ratingStats.average;
+  const hasOriginalScript = movie.original_title && movie.original_title !== movie.title;
 
   return (
     <div
@@ -20,7 +22,8 @@ export const MovieCard = ({ movie, onSelectMovie }) => {
         flexDirection: 'column',
         position: 'relative',
         cursor: 'pointer',
-        height: '100%'
+        height: '100%',
+        transition: 'transform 0.25s ease, box-shadow 0.25s ease'
       }}
       onClick={() => onSelectMovie(movie.id)}
     >
@@ -70,7 +73,7 @@ export const MovieCard = ({ movie, onSelectMovie }) => {
           </div>
         )}
 
-        {/* Top Badges */}
+        {/* Top Badges: Score & Actions */}
         <div
           style={{
             position: 'absolute',
@@ -83,32 +86,57 @@ export const MovieCard = ({ movie, onSelectMovie }) => {
             zIndex: 3
           }}
         >
-          {ratingStats.average ? (
-            <span
-              className="badge"
-              style={{
-                background: 'rgba(9, 12, 21, 0.85)',
-                backdropFilter: 'blur(8px)',
-                color: '#fbbf24',
-                border: '1px solid rgba(245, 158, 11, 0.4)',
-                fontSize: '0.75rem',
-                fontWeight: 700
-              }}
-            >
-              <Star size={11} fill="#fbbf24" /> {ratingStats.average}
-            </span>
-          ) : (
-            <span
-              className="badge badge-surface"
-              style={{
-                background: 'rgba(9, 12, 21, 0.75)',
-                backdropFilter: 'blur(8px)',
-                fontSize: '0.7rem'
-              }}
-            >
-              New
-            </span>
-          )}
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            {tmdbScore ? (
+              <span
+                className="badge"
+                style={{
+                  background: 'rgba(9, 12, 21, 0.88)',
+                  backdropFilter: 'blur(8px)',
+                  color: '#fbbf24',
+                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <Star size={11} fill="#fbbf24" color="#fbbf24" /> {tmdbScore}
+              </span>
+            ) : (
+              <span
+                className="badge badge-surface"
+                style={{
+                  background: 'rgba(9, 12, 21, 0.75)',
+                  backdropFilter: 'blur(8px)',
+                  fontSize: '0.7rem'
+                }}
+              >
+                New
+              </span>
+            )}
+
+            {movie.popularity > 80 && (
+              <span
+                title={`Popularity Score: ${movie.popularity}`}
+                style={{
+                  background: 'rgba(239, 68, 68, 0.25)',
+                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  color: '#f87171',
+                  padding: '2px 6px',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '2px'
+                }}
+              >
+                <Flame size={11} fill="#f87171" color="#f87171" /> Hot
+              </span>
+            )}
+          </div>
 
           {/* Action Buttons: Playlist + Watchlist */}
           <div style={{ display: 'flex', gap: '6px' }}>
@@ -162,7 +190,7 @@ export const MovieCard = ({ movie, onSelectMovie }) => {
           </div>
         </div>
 
-        {/* Bottom Tags: Primary Genre + Streaming Provider */}
+        {/* Bottom Tags: Primary Genre + Language + Streaming Provider */}
         <div
           style={{
             position: 'absolute',
@@ -175,20 +203,36 @@ export const MovieCard = ({ movie, onSelectMovie }) => {
             zIndex: 3
           }}
         >
-          {primaryGenre && (
-            <span
-              className="badge"
-              style={{
-                background: 'rgba(9, 12, 21, 0.85)',
-                backdropFilter: 'blur(8px)',
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border-subtle)',
-                fontSize: '0.68rem'
-              }}
-            >
-              {primaryGenre}
-            </span>
-          )}
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {primaryGenre && (
+              <span
+                className="badge"
+                style={{
+                  background: 'rgba(9, 12, 21, 0.85)',
+                  backdropFilter: 'blur(8px)',
+                  color: 'var(--text-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                  fontSize: '0.68rem'
+                }}
+              >
+                {primaryGenre}
+              </span>
+            )}
+            {movie.language && (
+              <span
+                className="badge"
+                style={{
+                  background: 'rgba(9, 12, 21, 0.85)',
+                  backdropFilter: 'blur(8px)',
+                  color: 'var(--accent-glow)',
+                  border: '1px solid var(--border-subtle)',
+                  fontSize: '0.68rem'
+                }}
+              >
+                {movie.language}
+              </span>
+            )}
+          </div>
 
           {primaryProvider && (
             <span
@@ -224,7 +268,7 @@ export const MovieCard = ({ movie, onSelectMovie }) => {
               fontSize: '1rem',
               fontWeight: 700,
               color: 'var(--text-primary)',
-              marginBottom: '6px',
+              marginBottom: hasOriginalScript ? '2px' : '6px',
               lineHeight: 1.3,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -234,6 +278,23 @@ export const MovieCard = ({ movie, onSelectMovie }) => {
           >
             {movie.title}
           </h3>
+
+          {hasOriginalScript && (
+            <div
+              style={{
+                fontSize: '0.78rem',
+                color: 'var(--primary)',
+                fontStyle: 'italic',
+                marginBottom: '6px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                opacity: 0.85
+              }}
+            >
+              {movie.original_title}
+            </div>
+          )}
 
           <div
             style={{

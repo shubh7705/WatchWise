@@ -15,7 +15,13 @@ class Movie(models.Model):
     overview = models.TextField(blank=True, default="")
     tagline = models.CharField(max_length=255, blank=True, default="")
     release_year = models.PositiveIntegerField(null=True, blank=True)
+    release_date = models.CharField(max_length=50, blank=True, default="")
     language = models.CharField(max_length=50, blank=True, default="English")
+    original_title = models.CharField(max_length=255, blank=True, default="")
+    original_language = models.CharField(max_length=20, blank=True, default="en")
+    vote_average = models.FloatField(default=0.0)
+    vote_count = models.PositiveIntegerField(default=0)
+    popularity = models.FloatField(default=0.0)
     tmdb_id = models.PositiveIntegerField(unique=True, null=True, blank=True)
 
     genres = models.ManyToManyField(

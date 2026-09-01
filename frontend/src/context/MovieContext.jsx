@@ -397,12 +397,18 @@ export const MovieProvider = ({ children }) => {
     const newMovie = {
       id: Date.now(),
       title: movieData.title.trim(),
+      original_title: movieData.original_title || movieData.title.trim(),
+      original_language: movieData.original_language || 'en',
       overview: movieData.overview?.trim() || '',
       release_year: Number(movieData.release_year) || new Date().getFullYear(),
+      release_date: movieData.release_date || '',
       language: movieData.language || 'English',
       duration_minutes: Number(movieData.duration_minutes) || 120,
-      poster: movieData.poster?.trim() || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80',
-      backdrop: movieData.backdrop?.trim() || movieData.poster?.trim() || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+      vote_average: Number(movieData.vote_average) || 7.5,
+      vote_count: Number(movieData.vote_count) || 150,
+      popularity: Number(movieData.popularity) || 50.0,
+      poster: movieData.poster?.trim() || 'https://image.tmdb.org/t/p/w500/yUtaHkL2SDIAZhRApZAyQrAXygn.jpg',
+      backdrop: movieData.backdrop?.trim() || movieData.poster?.trim() || 'https://image.tmdb.org/t/p/original/yUtaHkL2SDIAZhRApZAyQrAXygn.jpg',
       genres: movieData.genres || [1],
       created_by: currentUser ? currentUser.id : 1,
       created_at: new Date().toISOString(),
@@ -459,14 +465,34 @@ export const MovieProvider = ({ children }) => {
           }
         }
 
+        const rawLang = detailData.original_language || top.original_language || 'en';
+        const langMap = {
+          hi: 'Hindi',
+          te: 'Telugu',
+          ta: 'Tamil',
+          ml: 'Malayalam',
+          kn: 'Kannada',
+          en: 'English',
+          ko: 'Korean',
+          ja: 'Japanese',
+          es: 'Spanish',
+          fr: 'French'
+        };
+
         return {
           title: detailData.title || top.title,
+          original_title: detailData.original_title || top.original_title || detailData.title,
+          original_language: rawLang,
           overview: detailData.overview || top.overview,
           release_year: (detailData.release_date || top.release_date || '').split('-')[0] || year || '',
-          language: detailData.original_language === 'hi' ? 'Hindi' : detailData.original_language === 'te' ? 'Telugu' : detailData.original_language === 'en' ? 'English' : detailData.original_language || 'English',
+          release_date: detailData.release_date || top.release_date || '',
+          language: langMap[rawLang] || rawLang.toUpperCase(),
           duration_minutes: detailData.runtime || 135,
+          vote_average: Math.round(((detailData.vote_average || top.vote_average || 7.5) + Number.EPSILON) * 10) / 10,
+          vote_count: detailData.vote_count || top.vote_count || 120,
+          popularity: Math.round(((detailData.popularity || top.popularity || 45.0) + Number.EPSILON) * 10) / 10,
           poster: top.poster_path ? `https://image.tmdb.org/t/p/w500${top.poster_path}` : '',
-          backdrop: top.backdrop_path ? `https://image.tmdb.org/t/p/original${top.backdrop_path}` : '',
+          backdrop: (detailData.backdrop_path || top.backdrop_path) ? `https://image.tmdb.org/t/p/original${detailData.backdrop_path || top.backdrop_path}` : '',
           genres: detailData.genres ? detailData.genres.map(g => {
             const match = genres.find(item => item.tmdb_id === g.id || item.name.toLowerCase() === g.name.toLowerCase());
             return match ? match.id : null;

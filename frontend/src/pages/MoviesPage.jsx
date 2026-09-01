@@ -47,7 +47,11 @@ export const MoviesPage = ({ onSelectMovie, onOpenAddMovie }) => {
     }
 
     // Sorting
-    if (sortBy === 'rating') {
+    if (sortBy === 'popularity') {
+      list.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+    } else if (sortBy === 'tmdb_rating') {
+      list.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0));
+    } else if (sortBy === 'rating') {
       list.sort((a, b) => {
         const avgA = getMovieRatingStats(a.id).average || 0;
         const avgB = getMovieRatingStats(b.id).average || 0;
@@ -131,8 +135,10 @@ export const MoviesPage = ({ onSelectMovie, onOpenAddMovie }) => {
                   width: 'auto'
                 }}
               >
-                <option value="recommended">Featured / Default</option>
-                <option value="rating">Top Rated ⭐</option>
+                <option value="recommended">Featured / Curated</option>
+                <option value="popularity">Trending & Popularity 🔥</option>
+                <option value="tmdb_rating">TMDb Top Rated ⭐</option>
+                <option value="rating">Community Top Rated</option>
                 <option value="newest">Release Year (Newest)</option>
                 <option value="duration">Runtime (Longest)</option>
                 <option value="title">Alphabetical (A-Z)</option>

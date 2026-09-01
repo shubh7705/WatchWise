@@ -241,13 +241,28 @@ export const MovieDetailPage = ({ movieId, onBack, onSelectMovie }) => {
               )}
             </div>
 
-            {/* Title & Tagline */}
-            <h1 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, marginBottom: '8px', lineHeight: 1.15 }}>
+            {/* Title & Native Original Title */}
+            <h1 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, marginBottom: '4px', lineHeight: 1.15 }}>
               {movie.title}
             </h1>
 
+            {movie.original_title && movie.original_title !== movie.title && (
+              <div
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 700,
+                  color: 'var(--primary)',
+                  marginBottom: '10px',
+                  letterSpacing: '0.02em',
+                  fontFamily: 'var(--font-display)'
+                }}
+              >
+                {movie.original_title}
+              </div>
+            )}
+
             {movie.tagline && (
-              <p style={{ fontStyle: 'italic', color: 'var(--primary)', fontWeight: 600, fontSize: '1.05rem', marginBottom: '16px' }}>
+              <p style={{ fontStyle: 'italic', color: 'var(--text-secondary)', fontWeight: 500, fontSize: '1.05rem', marginBottom: '16px' }}>
                 "{movie.tagline}"
               </p>
             )}
@@ -316,39 +331,76 @@ export const MovieDetailPage = ({ movieId, onBack, onSelectMovie }) => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: '20px',
-                padding: '18px 24px',
+                padding: '20px 24px',
                 background: 'var(--bg-surface-elevated)',
                 border: '1px solid var(--border-glass)',
                 borderRadius: 'var(--radius-md)',
                 flexWrap: 'wrap'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05))',
-                    border: '1px solid var(--border-focus)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <Star size={24} fill="var(--primary)" color="var(--primary)" />
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--text-primary)' }}>
-                      {ratingStats.average || '—'}
-                    </span>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>/ 5</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+                {/* WatchWise Community Score */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05))',
+                      border: '1px solid var(--border-focus)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <Star size={22} fill="var(--primary)" color="var(--primary)" />
                   </div>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    Based on {ratingStats.count} community {ratingStats.count === 1 ? 'review' : 'reviews'}
-                  </span>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                      <span style={{ fontSize: '1.45rem', fontWeight: 900, color: 'var(--text-primary)' }}>
+                        {ratingStats.average || '—'}
+                      </span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>/ 5</span>
+                    </div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                      WatchWise ({ratingStats.count})
+                    </span>
+                  </div>
                 </div>
+
+                {/* TMDb Global Score */}
+                {movie.vote_average && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderLeft: '1px solid var(--border-glass)', paddingLeft: '20px' }}>
+                    <div
+                      style={{
+                        width: '44px',
+                        height: '44px',
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.05))',
+                        border: '1px solid rgba(6, 182, 212, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--accent-cyan)',
+                        fontWeight: 800,
+                        fontSize: '0.75rem'
+                      }}
+                    >
+                      TMDb
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                        <span style={{ fontSize: '1.45rem', fontWeight: 900, color: 'var(--accent-cyan)' }}>
+                          {movie.vote_average}
+                        </span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>/ 10</span>
+                      </div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                        {movie.vote_count ? `${Number(movie.vote_count).toLocaleString()} votes` : 'Official Score'}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button
