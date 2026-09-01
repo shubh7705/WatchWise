@@ -1,7 +1,4 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
 from movies.models import Movie
 
@@ -38,7 +35,8 @@ class Review(models.Model):
         choices=RATING_CHOICES
     )
 
-    review_text = models.TextField(blank=True)
+    review_text = models.TextField(blank=True, default="")
+    contains_spoiler = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -9,6 +9,7 @@ import {
   initialPlaylists
 } from '../data/initialData';
 import { useAuth } from './AuthContext';
+import { api } from '../services/api';
 
 const MovieContext = createContext();
 
@@ -39,7 +40,7 @@ export const MovieProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : initialMovies;
   });
 
-  const [genres] = useState(initialGenres);
+  const [genres, setGenres] = useState(initialGenres);
 
   const [reviews, setReviews] = useState(() => {
     const saved = localStorage.getItem('watchwise_reviews_v2');
@@ -60,6 +61,50 @@ export const MovieProvider = ({ children }) => {
     const saved = localStorage.getItem('watchwise_playlists');
     return saved ? JSON.parse(saved) : initialPlaylists;
   });
+
+  // Fetch initial data from Django backend API
+  useEffect(() => {
+    async function loadBackendData() {
+      try {
+        const [moviesRes, genresRes, reviewsRes, playlistsRes, clubsRes, watchlistRes] = await Promise.all([
+          api.getMovies(),
+          api.getGenres(),
+          api.getReviews(),
+          api.getPlaylists(),
+          api.getClubs(),
+          api.getWatchlist(currentUser?.id),
+        ]);
+
+        if (moviesRes?.movies?.length) {
+          setMovies(moviesRes.movies);
+        }
+        if (genresRes?.genres?.length) {
+          setGenres(genresRes.genres);
+        }
+        if (reviewsRes?.reviews?.length) {
+          setReviews(reviewsRes.reviews);
+        }
+        if (playlistsRes?.playlists?.length) {
+          setPlaylists(playlistsRes.playlists);
+        }
+        if (clubsRes?.clubs?.length) {
+          setClubs(clubsRes.clubs);
+        }
+        if (watchlistRes?.watched) {
+          const formattedWatch = watchlistRes.watched.map(mId => ({
+            user_id: currentUser?.id || 1,
+            movie_id: mId,
+            watched_at: new Date().toISOString()
+          }));
+          setWatchHistory(formattedWatch);
+        }
+      } catch (err) {
+        console.info('Using local cached store:', err.message);
+      }
+    }
+
+    loadBackendData();
+  }, [currentUser?.id]);
 
   // UI state
   const [searchQuery, setSearchQuery] = useState('');
@@ -162,7 +207,7 @@ export const MovieProvider = ({ children }) => {
     };
   };
 
-  const addOrUpdateReview = ({ movieId, rating, reviewText, containsSpoiler = false }) => {
+  const addOrUpdateReview = async ({ movieId, rating, reviewText, containsSpoiler = false }) => {
     if (!currentUser) {
       showToast('Please log in to submit a review', 'error');
       return false;
@@ -172,6 +217,15 @@ export const MovieProvider = ({ children }) => {
     const rat = Number(rating);
     const ratingObj = RATING_LEVELS.find(r => r.value === rat);
     const existingIndex = reviews.findIndex(r => r.movie_id === mId && r.user_id === currentUser.id);
+
+    // Sync with backend API
+    api.saveReview({
+      movie_id: mId,
+      user_id: currentUser.id,
+      rating: rat,
+      review_text: reviewText.trim(),
+      contains_spoiler: !!containsSpoiler
+    });
 
     if (existingIndex > -1) {
       const updated = [...reviews];
@@ -184,7 +238,7 @@ export const MovieProvider = ({ children }) => {
         updated_at: new Date().toISOString()
       };
       setReviews(updated);
-      showToast('Your review has been updated!');
+      showToast('Your review has been updated in database!');
     } else {
       const newReview = {
         id: Date.now(),
@@ -199,7 +253,7 @@ export const MovieProvider = ({ children }) => {
         created_at: new Date().toISOString()
       };
       setReviews(prev => [newReview, ...prev]);
-      showToast('Review and rating published!');
+      showToast('Review and rating published to database!');
     }
 
     if (rat >= 4) {
@@ -214,6 +268,7 @@ export const MovieProvider = ({ children }) => {
   };
 
   const deleteReview = (reviewId) => {
+    api.deleteReview(reviewId);
     setReviews(prev => prev.filter(r => r.id !== reviewId));
     showToast('Review removed');
   };
@@ -234,6 +289,9 @@ export const MovieProvider = ({ children }) => {
     const alreadyWatched = isWatched(mId, currentUser.id);
     const movieObj = movies.find(m => m.id === mId);
     const movieTitle = movieObj ? movieObj.title : 'Movie';
+
+    // Sync with backend API
+    api.toggleWatchlist(mId, currentUser.id);
 
     if (alreadyWatched) {
       setWatchHistory(prev => prev.filter(w => !(w.movie_id === mId && w.user_id === currentUser.id)));
@@ -258,8 +316,9 @@ export const MovieProvider = ({ children }) => {
   };
 
   // Playlist management
-  const createPlaylist = ({ title, description, cover }) => {
+  const createPlaylist = async ({ title, description, cover }) => {
     if (!currentUser) return null;
+
     const newPlaylist = {
       id: Date.now(),
       title: title.trim(),
@@ -272,13 +331,30 @@ export const MovieProvider = ({ children }) => {
     };
 
     setPlaylists(prev => [newPlaylist, ...prev]);
-    showToast(`Playlist "${newPlaylist.title}" created!`);
+    showToast(`Playlist "${newPlaylist.title}" saved to database!`);
+
+    // Sync with backend
+    const res = await api.createPlaylist({
+      title: newPlaylist.title,
+      description: newPlaylist.description,
+      cover: newPlaylist.cover,
+      user_id: currentUser.id
+    });
+
+    if (res?.playlist?.id) {
+      setPlaylists(prev => prev.map(p => p.id === newPlaylist.id ? { ...p, id: res.playlist.id } : p));
+    }
+
     return newPlaylist;
   };
 
   const addMovieToPlaylist = (playlistId, movieId) => {
     const mId = Number(movieId);
     const movie = movies.find(m => m.id === mId);
+
+    // Sync with backend
+    api.togglePlaylistMovie(playlistId, mId);
+
     setPlaylists(prev => prev.map(p => {
       if (p.id === Number(playlistId)) {
         if (p.movies.includes(mId)) {
@@ -297,6 +373,7 @@ export const MovieProvider = ({ children }) => {
   };
 
   const removeMovieFromPlaylist = (playlistId, movieId) => {
+    api.togglePlaylistMovie(playlistId, Number(movieId));
     setPlaylists(prev => prev.map(p => {
       if (p.id === Number(playlistId)) {
         return {
@@ -310,12 +387,13 @@ export const MovieProvider = ({ children }) => {
   };
 
   const deletePlaylist = (playlistId) => {
+    api.deletePlaylist(playlistId);
     setPlaylists(prev => prev.filter(p => p.id !== Number(playlistId)));
     showToast('Playlist deleted');
   };
 
   // Add Movie
-  const addMovie = (movieData) => {
+  const addMovie = async (movieData) => {
     const newMovie = {
       id: Date.now(),
       title: movieData.title.trim(),
@@ -326,17 +404,25 @@ export const MovieProvider = ({ children }) => {
       poster: movieData.poster?.trim() || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=500&q=80',
       backdrop: movieData.backdrop?.trim() || movieData.poster?.trim() || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
       genres: movieData.genres || [1],
-      created_by: currentUser ? currentUser.id : 4,
+      created_by: currentUser ? currentUser.id : 1,
       created_at: new Date().toISOString(),
       featured: false,
       tagline: movieData.tagline || '',
       trailer_url: movieData.trailer_url || 'https://www.youtube.com/watch?v=tQ0mzXRk-oI',
       streaming_on: movieData.streaming_on || ['Prime Video'],
-      mood_tags: movieData.mood_tags || ['adrenaline', 'popcorn']
+      mood_tags: movieData.mood_tags || ['adrenaline', 'popcorn'],
+      tmdb_id: movieData.tmdb_id || null
     };
 
     setMovies(prev => [newMovie, ...prev]);
-    showToast(`"${newMovie.title}" added to catalog!`);
+    showToast(`"${newMovie.title}" saved to database!`);
+
+    // Sync with Django backend
+    const res = await api.createMovie(newMovie);
+    if (res?.movie?.id) {
+      setMovies(prev => prev.map(m => m.id === newMovie.id ? { ...m, id: res.movie.id } : m));
+    }
+
     return newMovie;
   };
 
@@ -381,7 +467,8 @@ export const MovieProvider = ({ children }) => {
           }).filter(Boolean) : [1],
           tagline: detailData.tagline || '',
           trailer_url: trailerUrl || 'https://www.youtube.com/watch?v=tQ0mzXRk-oI',
-          streaming_on: ["Prime Video", "Netflix"]
+          streaming_on: ["Prime Video", "Netflix"],
+          tmdb_id: top.id
         };
       }
     } catch (err) {
@@ -409,44 +496,62 @@ export const MovieProvider = ({ children }) => {
       showToast('Please log in to join clubs', 'error');
       return;
     }
+    api.toggleJoinClub(clubId, currentUser.id);
+
     setClubs(prev => prev.map(c => {
       if (c.id === clubId) {
-        const isMember = c.members.includes(currentUser.id);
+        const isMember = c.members ? c.members.includes(currentUser.id) : c.is_member;
         const newMembers = isMember
-          ? c.members.filter(id => id !== currentUser.id)
-          : [...c.members, currentUser.id];
+          ? (c.members || []).filter(id => id !== currentUser.id)
+          : [...(c.members || []), currentUser.id];
         showToast(isMember ? `Left ${c.name}` : `Joined ${c.name}! 🎉`);
         return {
           ...c,
           members: newMembers,
-          members_count: isMember ? c.members_count - 1 : c.members_count + 1
+          member_count: isMember ? (c.member_count || 1) - 1 : (c.member_count || 0) + 1,
+          is_member: !isMember
         };
       }
       return c;
     }));
   };
 
-  const createClub = (clubData) => {
+  const createClub = async (clubData) => {
     if (!currentUser) return;
     const newClub = {
       id: Date.now(),
       name: clubData.name.trim(),
       description: clubData.description?.trim() || '',
-      banner: clubData.banner?.trim() || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+      avatar: clubData.banner?.trim() || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80',
+      category: clubData.category || 'Discussion',
       created_by: currentUser.id,
       created_by_name: currentUser.username,
-      members_count: 1,
+      member_count: 1,
       created_at: new Date().toISOString(),
       members: [currentUser.id],
+      is_member: true,
       posts: []
     };
 
     setClubs(prev => [newClub, ...prev]);
     showToast(`Club "${newClub.name}" created!`);
+
+    const res = await api.createClub({
+      name: newClub.name,
+      description: newClub.description,
+      avatar: newClub.avatar,
+      category: newClub.category,
+      user_id: currentUser.id
+    });
+
+    if (res?.club?.id) {
+      setClubs(prev => prev.map(c => c.id === newClub.id ? { ...c, id: res.club.id } : c));
+    }
+
     return newClub;
   };
 
-  const addClubPost = (clubId, { content, image }) => {
+  const addClubPost = async (clubId, { content, image }) => {
     if (!currentUser) {
       showToast('Please log in to post in clubs', 'error');
       return;
@@ -455,11 +560,11 @@ export const MovieProvider = ({ children }) => {
       id: Date.now(),
       user_id: currentUser.id,
       username: currentUser.username,
-      user_avatar: currentUser.avatar,
+      avatar: currentUser.avatar,
       content: content.trim(),
       image: image || null,
       likes: 0,
-      created_at: new Date().toISOString(),
+      timestamp: "Just now",
       comments: []
     };
 
@@ -467,12 +572,18 @@ export const MovieProvider = ({ children }) => {
       if (c.id === clubId) {
         return {
           ...c,
-          posts: [newPost, ...c.posts]
+          posts: [newPost, ...(c.posts || [])]
         };
       }
       return c;
     }));
     showToast('Post published to club feed!');
+
+    api.createClubPost(clubId, {
+      content: newPost.content,
+      image: newPost.image,
+      user_id: currentUser.id
+    });
   };
 
   const addClubComment = (clubId, postId, commentText) => {
@@ -483,19 +594,20 @@ export const MovieProvider = ({ children }) => {
     const newComment = {
       id: Date.now(),
       username: currentUser.username,
-      content: commentText.trim(),
-      created_at: new Date().toISOString()
+      avatar: currentUser.avatar,
+      text: commentText.trim(),
+      time: "Just now"
     };
 
     setClubs(prev => prev.map(c => {
       if (c.id === clubId) {
         return {
           ...c,
-          posts: c.posts.map(p => {
+          posts: (c.posts || []).map(p => {
             if (p.id === postId) {
               return {
                 ...p,
-                comments: [...p.comments, newComment]
+                comments: [...(p.comments || []), newComment]
               };
             }
             return p;
@@ -512,11 +624,11 @@ export const MovieProvider = ({ children }) => {
       if (c.id === clubId) {
         return {
           ...c,
-          posts: c.posts.map(p => {
+          posts: (c.posts || []).map(p => {
             if (p.id === postId) {
               return {
                 ...p,
-                likes: p.likes + 1
+                likes: (p.likes || 0) + 1
               };
             }
             return p;
