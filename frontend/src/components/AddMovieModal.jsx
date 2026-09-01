@@ -45,24 +45,58 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;
 
-    const newMovie = addMovie({
+    let finalPoster = poster;
+    let finalBackdrop = backdrop;
+    let finalOverview = overview;
+    let finalYear = releaseYear;
+    let finalLanguage = language;
+    let finalDuration = durationMinutes;
+    let finalTagline = tagline;
+    let finalGenres = selectedGenres;
+    let tmdbId = null;
+
+    // If user didn't manually auto-fetch, fetch TMDb poster & details automatically
+    if (!finalPoster) {
+      setIsFetchingTmdb(true);
+      try {
+        const data = await fetchTmdbMovie(title, releaseYear);
+        if (data) {
+          if (data.poster) finalPoster = data.poster;
+          if (data.backdrop) finalBackdrop = data.backdrop;
+          if (!finalOverview && data.overview) finalOverview = data.overview;
+          if (!finalYear && data.release_year) finalYear = data.release_year;
+          if (data.tagline) finalTagline = data.tagline;
+          if (data.tmdb_id) tmdbId = data.tmdb_id;
+          if (data.genres?.length) finalGenres = data.genres;
+        }
+      } catch (err) {
+        console.warn('TMDb submit fetch error', err);
+      } finally {
+        setIsFetchingTmdb(false);
+      }
+    }
+
+    const newMovie = await addMovie({
       title,
-      release_year: releaseYear || new Date().getFullYear(),
-      overview,
-      language,
-      duration_minutes: durationMinutes,
-      poster,
-      backdrop,
-      tagline,
-      genres: selectedGenres
+      release_year: finalYear || new Date().getFullYear(),
+      overview: finalOverview,
+      language: finalLanguage,
+      duration_minutes: finalDuration,
+      poster: finalPoster,
+      backdrop: finalBackdrop,
+      tagline: finalTagline,
+      genres: finalGenres,
+      tmdb_id: tmdbId
     });
 
-    onMovieAdded(newMovie.id);
-    onClose();
+    if (newMovie) {
+      onMovieAdded(newMovie.id);
+      onClose();
+    }
   };
 
   return (
