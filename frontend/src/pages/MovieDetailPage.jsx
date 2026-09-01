@@ -42,7 +42,7 @@ export const MovieDetailPage = ({ movieId, onBack, onSelectMovie }) => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [revealedSpoilers, setRevealedSpoilers] = useState({});
 
-  const movie = movies.find(m => m.id === Number(movieId));
+  const movie = movies.find(m => m.id === Number(movieId) || String(m.id) === String(movieId));
 
   if (!movie) {
     return (

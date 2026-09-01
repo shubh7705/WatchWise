@@ -418,12 +418,18 @@ export const MovieProvider = ({ children }) => {
     showToast(`"${newMovie.title}" saved to database!`);
 
     // Sync with Django backend
-    const res = await api.createMovie(newMovie);
-    if (res?.movie?.id) {
-      setMovies(prev => prev.map(m => m.id === newMovie.id ? { ...m, id: res.movie.id } : m));
+    let finalMovie = newMovie;
+    try {
+      const res = await api.createMovie(newMovie);
+      if (res?.movie?.id) {
+        finalMovie = { ...newMovie, id: res.movie.id };
+        setMovies(prev => prev.map(m => m.id === newMovie.id ? finalMovie : m));
+      }
+    } catch (err) {
+      console.warn('Backend sync error in addMovie', err);
     }
 
-    return newMovie;
+    return finalMovie;
   };
 
   // TMDb Live Autofill Search API
