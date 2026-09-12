@@ -18,7 +18,7 @@ import { useAuth } from '../context/AuthContext';
 import { useMovies } from '../context/MovieContext';
 
 export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
-  const { currentUser, users, switchUser, logout, isAuthenticated } = useAuth();
+  const { currentUser, users, switchUser, logout, isAuthenticated, isAdmin } = useAuth();
   const { theme, toggleTheme, searchQuery, setSearchQuery, setIsMoodModalOpen } = useMovies();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
