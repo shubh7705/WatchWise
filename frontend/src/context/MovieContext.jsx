@@ -423,7 +423,8 @@ export const MovieProvider = ({ children }) => {
       streaming_on: movieData.streaming_on || ['Prime Video'],
       mood_tags: movieData.mood_tags || ['adrenaline', 'popcorn'],
       tmdb_id: movieData.tmdb_id || null,
-      user_id: currentUser?.id
+      user_id: currentUser?.id,
+      username: currentUser?.username
     };
 
     setMovies(prev => [newMovie, ...prev]);
@@ -467,7 +468,7 @@ export const MovieProvider = ({ children }) => {
     showToast(`"${title}" deleted from database`);
 
     try {
-      await api.deleteMovie(mId, currentUser?.id);
+      await api.deleteMovie(mId, currentUser?.id, currentUser?.username);
     } catch (err) {
       console.warn('Backend delete error:', err);
     }

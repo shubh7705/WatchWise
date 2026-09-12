@@ -7,7 +7,19 @@ export const AuthProvider = ({ children }) => {
   // Load users from storage or initial seed
   const [users, setUsers] = useState(() => {
     const saved = localStorage.getItem('watchwise_users');
-    return saved ? JSON.parse(saved) : initialUsers;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        // Ensure known admin accounts have proper role
+        return parsed.map(u => {
+          const isKnownAdmin = ['shubh', 'shubham', 'admin'].includes(u.username?.toLowerCase());
+          return isKnownAdmin ? { ...u, role: 'admin', is_staff: true } : u;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    return initialUsers;
   });
 
   // Current logged in user (defaults to shubh for effortless instant access)
@@ -15,13 +27,52 @@ export const AuthProvider = ({ children }) => {
     const savedCurrent = localStorage.getItem('watchwise_current_user');
     if (savedCurrent) {
       try {
-        return JSON.parse(savedCurrent);
+        const parsed = JSON.parse(savedCurrent);
+        const isKnownAdmin = ['shubh', 'shubham', 'admin'].includes(parsed.username?.toLowerCase());
+        const match = initialUsers.find(u => u.username.toLowerCase() === parsed.username.toLowerCase());
+        return {
+          ...parsed,
+          id: match ? match.id : parsed.id,
+          role: isKnownAdmin ? 'admin' : (parsed.role || 'user'),
+          is_staff: isKnownAdmin ? true : Boolean(parsed.is_staff)
+        };
       } catch (e) {
         console.error(e);
       }
     }
     return initialUsers.find(u => u.username === 'shubh') || initialUsers[0];
   });
+
+  // Sync users from backend API
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/auth/users/')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.users?.length) {
+          setUsers(prev => {
+            const merged = data.users.map(backendUser => {
+              const localMatch = prev.find(u => u.username.toLowerCase() === backendUser.username.toLowerCase());
+              return {
+                ...backendUser,
+                avatar: localMatch?.avatar || backendUser.avatar,
+                bio: localMatch?.bio || 'Movie lover and WatchWise explorer.'
+              };
+            });
+            return merged;
+          });
+
+          setCurrentUser(prev => {
+            if (!prev) return prev;
+            const match = data.users.find(u => u.username.toLowerCase() === prev.username.toLowerCase());
+            if (match) {
+              return { ...prev, id: match.id, role: match.role, is_staff: match.is_staff };
+            }
+            return prev;
+          });
+        }
+      })
+      .catch(err => console.info('Backend users load info:', err.message));
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('watchwise_users', JSON.stringify(users));

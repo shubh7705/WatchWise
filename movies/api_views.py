@@ -101,19 +101,38 @@ def serialize_club(group, current_user=None):
     }
 
 
-def is_admin_user(user_or_id):
+def get_req_user(request):
     """
-    Check if the user is an admin / staff or has admin username.
+    Safely retrieve user from request without throwing AttributeError.
     """
-    if not user_or_id:
-        return False
+    user = getattr(request, "user", None)
+    if user and getattr(user, "is_authenticated", False):
+        return user
+    return None
+
+
+def is_admin_user(user_or_id=None, username=None):
+    """
+    Check if the requester has admin / staff privileges.
+    Supports User instance, user ID, username string, or staff/superuser flags.
+    """
+    if username and str(username).strip().lower() in ["shubh", "shubham", "admin"]:
+        return True
+
     if isinstance(user_or_id, User):
         return (
             user_or_id.is_staff
             or user_or_id.is_superuser
             or user_or_id.username.lower() in ["shubh", "shubham", "admin"]
         )
-    try:
+
+    if isinstance(user_or_id, str):
+        if user_or_id.isdigit():
+            user_or_id = int(user_or_id)
+        elif user_or_id.strip().lower() in ["shubh", "shubham", "admin"]:
+            return True
+
+    if isinstance(user_or_id, int):
         user = User.objects.filter(id=user_or_id).first()
         if user:
             return (
@@ -121,8 +140,16 @@ def is_admin_user(user_or_id):
                 or user.is_superuser
                 or user.username.lower() in ["shubh", "shubham", "admin"]
             )
-    except Exception:
-        pass
+
+    if username:
+        user = User.objects.filter(username__iexact=str(username).strip()).first()
+        if user:
+            return (
+                user.is_staff
+                or user.is_superuser
+                or user.username.lower() in ["shubh", "shubham", "admin"]
+            )
+
     return False
 
 
@@ -140,11 +167,22 @@ def api_movies_list_create(request):
     elif request.method == "POST":
         try:
             payload = json.loads(request.body.decode("utf-8"))
-            user_id = payload.get("user_id") or payload.get("created_by") or (request.user.id if request.user.is_authenticated else None)
+            req_user = get_req_user(request)
+            user_id = payload.get("user_id") or payload.get("created_by") or (req_user.id if req_user else None)
+            username = payload.get("username") or (req_user.username if req_user else None)
 
             # Role-Based Control: Only admins can add movies
-            if not is_admin_user(user_id or request.user):
+            if not is_admin_user(user_or_id=user_id or req_user, username=username):
                 return JsonResponse({"error": "Permission denied. Only admins can add movies."}, status=403)
+
+            # Determine creator User ID
+            creator_id = None
+            if isinstance(user_id, int) and User.objects.filter(id=user_id).exists():
+                creator_id = user_id
+            elif username:
+                found_user = User.objects.filter(username__iexact=username).first()
+                if found_user:
+                    creator_id = found_user.id
 
             movie = Movie.objects.create(
                 title=payload.get("title", "Untitled"),
@@ -166,7 +204,7 @@ def api_movies_list_create(request):
                 mood_tags=payload.get("mood_tags", []),
                 featured=payload.get("featured", False),
                 tmdb_id=payload.get("tmdb_id"),
-                created_by_id=user_id if User.objects.filter(id=user_id).exists() else None
+                created_by_id=creator_id
             )
 
             genre_ids = payload.get("genres", [])
@@ -188,16 +226,19 @@ def api_movie_delete(request, movie_id):
     """
     if request.method in ["DELETE", "POST"]:
         try:
+            req_user = get_req_user(request)
             user_id = None
+            username = None
             if request.body:
                 try:
                     payload = json.loads(request.body.decode("utf-8"))
                     user_id = payload.get("user_id")
+                    username = payload.get("username")
                 except Exception:
                     pass
 
             # Role-Based Control: Only admins can delete movies
-            if not is_admin_user(user_id or request.user):
+            if not is_admin_user(user_or_id=user_id or req_user, username=username):
                 return JsonResponse({"error": "Permission denied. Only admins can delete movies."}, status=403)
 
             movie = Movie.objects.filter(id=movie_id).first()
@@ -209,6 +250,8 @@ def api_movie_delete(request, movie_id):
             return JsonResponse({"success": True, "message": f'Movie "{movie_title}" deleted successfully'})
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Method not allowed"}, status=405)
 
     return JsonResponse({"error": "Method not allowed"}, status=405)
 

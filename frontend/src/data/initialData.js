@@ -23,11 +23,11 @@ export const initialGenres = [
 ];
 
 export const initialUsers = [
-  { id: 2, username: "India", email: "india@watchwise.com", role: "user", is_staff: false, bio: "Proud cinephile exploring world and Indian cinema.", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" },
-  { id: 3, username: "shubham", email: "shubham@watchwise.com", role: "admin", is_staff: true, bio: "Director & movie critique. Lover of high-octane thrillers and sci-fi.", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80" },
-  { id: 4, username: "shubh", email: "shubh@watchwise.com", role: "admin", is_staff: true, bio: "Founder of WatchWise. Finding cinema gems every day.", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80" },
-  { id: 5, username: "user1", email: "user1@watchwise.com", role: "user", is_staff: false, bio: "Weekend movie binge enthusiast.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" },
-  { id: 6, username: "sanket", email: "sanket@watchwise.com", role: "user", is_staff: false, bio: "Passionate about drama, heart-touching stories and cinematography.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" }
+  { id: 1, username: "shubh", email: "shubh@watchwise.com", role: "admin", is_staff: true, bio: "Founder of WatchWise. Finding cinema gems every day.", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80" },
+  { id: 2, username: "shubham", email: "shubham@watchwise.com", role: "admin", is_staff: true, bio: "Director & movie critique. Lover of high-octane thrillers and sci-fi.", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80" },
+  { id: 3, username: "sanket", email: "sanket@watchwise.com", role: "user", is_staff: false, bio: "Passionate about drama, heart-touching stories and cinematography.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" },
+  { id: 4, username: "India", email: "india@watchwise.com", role: "user", is_staff: false, bio: "Proud cinephile exploring world and Indian cinema.", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" },
+  { id: 5, username: "user1", email: "user1@watchwise.com", role: "user", is_staff: false, bio: "Weekend movie binge enthusiast.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" }
 ];
 
 export const initialMovies = [
