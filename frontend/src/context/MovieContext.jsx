@@ -32,7 +32,7 @@ export const MOODS = [
 ];
 
 export const MovieProvider = ({ children }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
 
   // Storage synced state
   const [movies, setMovies] = useState(() => {
@@ -392,8 +392,13 @@ export const MovieProvider = ({ children }) => {
     showToast('Playlist deleted');
   };
 
-  // Add Movie
+  // Add Movie (Admin Only)
   const addMovie = async (movieData) => {
+    if (!isAdmin) {
+      showToast('Permission denied: Only admins can add movies.', 'error');
+      return null;
+    }
+
     const newMovie = {
       id: Date.now(),
       title: movieData.title.trim(),
@@ -417,7 +422,8 @@ export const MovieProvider = ({ children }) => {
       trailer_url: movieData.trailer_url || 'https://www.youtube.com/watch?v=tQ0mzXRk-oI',
       streaming_on: movieData.streaming_on || ['Prime Video'],
       mood_tags: movieData.mood_tags || ['adrenaline', 'popcorn'],
-      tmdb_id: movieData.tmdb_id || null
+      tmdb_id: movieData.tmdb_id || null,
+      user_id: currentUser?.id
     };
 
     setMovies(prev => [newMovie, ...prev]);
@@ -436,6 +442,37 @@ export const MovieProvider = ({ children }) => {
     }
 
     return finalMovie;
+  };
+
+  // Delete Movie (Admin Only)
+  const deleteMovie = async (movieId) => {
+    const mId = Number(movieId);
+    const targetMovie = movies.find(m => m.id === mId);
+    const title = targetMovie ? targetMovie.title : 'Movie';
+
+    if (!isAdmin) {
+      showToast('Permission denied: Only admins can delete movies.', 'error');
+      return false;
+    }
+
+    // Optimistic UI updates
+    setMovies(prev => prev.filter(m => m.id !== mId));
+    setReviews(prev => prev.filter(r => r.movie_id !== mId));
+    setPlaylists(prev => prev.map(p => ({
+      ...p,
+      movies: (p.movies || []).filter(id => id !== mId)
+    })));
+    setWatchHistory(prev => prev.filter(w => w.movie_id !== mId));
+
+    showToast(`"${title}" deleted from database`);
+
+    try {
+      await api.deleteMovie(mId, currentUser?.id);
+    } catch (err) {
+      console.warn('Backend delete error:', err);
+    }
+
+    return true;
   };
 
   // TMDb Live Autofill Search API
@@ -709,6 +746,7 @@ export const MovieProvider = ({ children }) => {
       isWatched,
       toggleWatch,
       addMovie,
+      deleteMovie,
       fetchTmdbMovie,
       joinClub,
       createClub,

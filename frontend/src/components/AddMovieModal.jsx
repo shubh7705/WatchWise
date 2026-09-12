@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Film, Loader2, Image as ImageIcon, Check } from 'lucide-react';
+import { X, Sparkles, Film, Loader2, Image as ImageIcon, Check, ShieldAlert } from 'lucide-react';
 import { useMovies } from '../context/MovieContext';
+import { useAuth } from '../context/AuthContext';
 
 export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
-  const { genres, addMovie, fetchTmdbMovie } = useMovies();
+  const { genres, addMovie, fetchTmdbMovie, showToast } = useMovies();
+  const { isAdmin } = useAuth();
 
   const [title, setTitle] = useState('');
   const [releaseYear, setReleaseYear] = useState('');
@@ -65,6 +67,11 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isAdmin) {
+      showToast('Permission denied. Only admins can add movies.', 'error');
+      onClose();
+      return;
+    }
     if (!title.trim()) return;
 
     let finalPoster = poster;

@@ -4,6 +4,8 @@ from . import api_views
 urlpatterns = [
     # Movies & Genres
     path("movies/", api_views.api_movies_list_create, name="api_movies_list_create"),
+    path("movies/<int:movie_id>/", api_views.api_movie_delete, name="api_movie_delete"),
+    path("movies/<int:movie_id>/delete/", api_views.api_movie_delete, name="api_movie_delete_alias"),
     path("genres/", api_views.api_genres_list, name="api_genres_list"),
 
     # Reviews

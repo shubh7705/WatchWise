@@ -35,14 +35,32 @@ export const AuthProvider = ({ children }) => {
     }
   }, [currentUser]);
 
+  const isAdmin = Boolean(
+    currentUser && (
+      currentUser.role === 'admin' ||
+      currentUser.is_staff ||
+      currentUser.is_superuser ||
+      currentUser.username?.toLowerCase() === 'shubh' ||
+      currentUser.username?.toLowerCase() === 'shubham' ||
+      currentUser.username?.toLowerCase() === 'admin'
+    )
+  );
+
   const login = (usernameOrEmail, password) => {
     const user = users.find(
       u => u.username.toLowerCase() === usernameOrEmail.toLowerCase() ||
            u.email?.toLowerCase() === usernameOrEmail.toLowerCase()
     );
     if (user) {
-      setCurrentUser(user);
-      return { success: true, user };
+      // Ensure admin flag on known accounts
+      const isKnownAdmin = ['shubh', 'shubham', 'admin'].includes(user.username.toLowerCase());
+      const effectiveUser = {
+        ...user,
+        role: isKnownAdmin ? 'admin' : (user.role || 'user'),
+        is_staff: isKnownAdmin ? true : Boolean(user.is_staff)
+      };
+      setCurrentUser(effectiveUser);
+      return { success: true, user: effectiveUser };
     }
     // If user doesn't exist, create on the fly or reject
     return { success: false, message: 'Invalid credentials. You can select one of the demo accounts below.' };
@@ -51,7 +69,13 @@ export const AuthProvider = ({ children }) => {
   const switchUser = (userId) => {
     const user = users.find(u => u.id === userId);
     if (user) {
-      setCurrentUser(user);
+      const isKnownAdmin = ['shubh', 'shubham', 'admin'].includes(user.username.toLowerCase());
+      const effectiveUser = {
+        ...user,
+        role: isKnownAdmin ? 'admin' : (user.role || 'user'),
+        is_staff: isKnownAdmin ? true : Boolean(user.is_staff)
+      };
+      setCurrentUser(effectiveUser);
     }
   };
 
@@ -61,12 +85,15 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message: 'Username is already taken' };
     }
 
+    const isKnownAdmin = ['shubh', 'shubham', 'admin'].includes(username.trim().toLowerCase());
     const newUser = {
       id: Date.now(),
       username: username.trim(),
       email: email?.trim() || `${username.toLowerCase()}@watchwise.com`,
       bio: bio || 'Movie lover and WatchWise explorer.',
-      avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`
+      avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`,
+      role: isKnownAdmin ? 'admin' : 'user',
+      is_staff: isKnownAdmin
     };
 
     const updated = [...users, newUser];
@@ -96,6 +123,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       users,
       currentUser,
+      isAdmin,
       login,
       signup,
       switchUser,

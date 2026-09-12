@@ -191,19 +191,21 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
             </button>
           )}
 
-          <button
-            onClick={onOpenAddMovie}
-            className="btn btn-sm btn-secondary"
-            style={{
-              borderRadius: 'var(--radius-full)',
-              borderColor: 'var(--primary-glow)',
-              color: 'var(--primary)'
-            }}
-            title="Add new movie via TMDb Autofill"
-          >
-            <PlusCircle size={16} />
-            <span style={{ display: 'inline' }}>Add Movie</span>
-          </button>
+          {isAdmin && (
+            <button
+              onClick={onOpenAddMovie}
+              className="btn btn-sm btn-secondary"
+              style={{
+                borderRadius: 'var(--radius-full)',
+                borderColor: 'var(--primary-glow)',
+                color: 'var(--primary)'
+              }}
+              title="Add new movie via TMDb Autofill (Admin Only)"
+            >
+              <PlusCircle size={16} />
+              <span style={{ display: 'inline' }}>Add Movie</span>
+            </button>
+          )}
         </nav>
 
         {/* Right Controls: Theme + User / Demo Switcher */}
@@ -253,6 +255,21 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
                   <span style={{ fontSize: '0.85rem', fontWeight: 600, maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {currentUser.username}
                   </span>
+                  {isAdmin ? (
+                    <span
+                      style={{
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        padding: '1px 6px',
+                        borderRadius: 'var(--radius-full)',
+                        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.08))',
+                        color: 'var(--primary)',
+                        border: '1px solid var(--border-focus)'
+                      }}
+                    >
+                      ADMIN
+                    </span>
+                  ) : null}
                   <ChevronDown size={13} color="var(--text-muted)" />
                 </button>
 
@@ -263,7 +280,7 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
                       position: 'absolute',
                       right: 0,
                       top: 'calc(100% + 10px)',
-                      width: '260px',
+                      width: '270px',
                       background: 'var(--bg-surface-elevated)',
                       border: '1px solid var(--border-glass)',
                       borderRadius: 'var(--radius-md)',
@@ -273,9 +290,23 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
                       animation: 'fadeIn 0.15s ease-out'
                     }}
                   >
-                    <div style={{ padding: '6px 10px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '8px' }}>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Signed in as</div>
-                      <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{currentUser.username}</div>
+                    <div style={{ padding: '6px 10px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Signed in as</div>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{currentUser.username}</div>
+                      </div>
+                      <span
+                        className="badge"
+                        style={{
+                          background: isAdmin ? 'rgba(245, 158, 11, 0.15)' : 'var(--bg-surface)',
+                          color: isAdmin ? 'var(--primary)' : 'var(--text-muted)',
+                          border: `1px solid ${isAdmin ? 'var(--border-focus)' : 'var(--border-subtle)'}`,
+                          fontSize: '0.7rem',
+                          fontWeight: 700
+                        }}
+                      >
+                        {isAdmin ? '👑 Admin' : '👤 Member'}
+                      </span>
                     </div>
 
                     <button
@@ -295,33 +326,48 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
                       <Sparkles size={12} style={{ display: 'inline', marginRight: '4px' }} /> Quick Switch User
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '140px', overflowY: 'auto' }}>
-                      {users.map(u => (
-                        <button
-                          key={u.id}
-                          onClick={() => {
-                            switchUser(u.id);
-                            setShowUserMenu(false);
-                          }}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '6px 10px',
-                            background: u.id === currentUser.id ? 'var(--bg-surface)' : 'transparent',
-                            borderRadius: 'var(--radius-sm)',
-                            border: u.id === currentUser.id ? '1px solid var(--border-focus)' : 'none',
-                            color: u.id === currentUser.id ? 'var(--primary)' : 'var(--text-secondary)',
-                            cursor: 'pointer',
-                            fontSize: '0.85rem',
-                            fontWeight: 500
-                          }}
-                        >
-                          <img src={u.avatar} alt={u.username} style={{ width: '20px', height: '20px', borderRadius: '50%' }} />
-                          <span>{u.username}</span>
-                          {u.id === currentUser.id && <span style={{ marginLeft: 'auto', fontSize: '0.7rem' }}>✓</span>}
-                        </button>
-                      ))}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '150px', overflowY: 'auto' }}>
+                      {users.map(u => {
+                        const isUserAdmin = u.role === 'admin' || u.is_staff || ['shubh', 'shubham', 'admin'].includes(u.username.toLowerCase());
+                        return (
+                          <button
+                            key={u.id}
+                            onClick={() => {
+                              switchUser(u.id);
+                              setShowUserMenu(false);
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              padding: '6px 10px',
+                              background: u.id === currentUser.id ? 'var(--bg-surface)' : 'transparent',
+                              borderRadius: 'var(--radius-sm)',
+                              border: u.id === currentUser.id ? '1px solid var(--border-focus)' : 'none',
+                              color: u.id === currentUser.id ? 'var(--primary)' : 'var(--text-secondary)',
+                              cursor: 'pointer',
+                              fontSize: '0.85rem',
+                              fontWeight: 500
+                            }}
+                          >
+                            <img src={u.avatar} alt={u.username} style={{ width: '20px', height: '20px', borderRadius: '50%' }} />
+                            <span>{u.username}</span>
+                            <span
+                              style={{
+                                marginLeft: 'auto',
+                                fontSize: '0.68rem',
+                                padding: '1px 5px',
+                                borderRadius: '4px',
+                                background: isUserAdmin ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                                color: isUserAdmin ? 'var(--primary)' : 'var(--text-muted)'
+                              }}
+                            >
+                              {isUserAdmin ? 'Admin' : 'User'}
+                            </span>
+                            {u.id === currentUser.id && <span style={{ fontSize: '0.7rem', color: 'var(--primary)' }}>✓</span>}
+                          </button>
+                        );
+                      })}
                     </div>
 
                     <hr style={{ border: 'none', borderTop: '1px solid var(--border-subtle)', margin: '8px 0' }} />

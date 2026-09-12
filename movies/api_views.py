@@ -101,6 +101,31 @@ def serialize_club(group, current_user=None):
     }
 
 
+def is_admin_user(user_or_id):
+    """
+    Check if the user is an admin / staff or has admin username.
+    """
+    if not user_or_id:
+        return False
+    if isinstance(user_or_id, User):
+        return (
+            user_or_id.is_staff
+            or user_or_id.is_superuser
+            or user_or_id.username.lower() in ["shubh", "shubham", "admin"]
+        )
+    try:
+        user = User.objects.filter(id=user_or_id).first()
+        if user:
+            return (
+                user.is_staff
+                or user.is_superuser
+                or user.username.lower() in ["shubh", "shubham", "admin"]
+            )
+    except Exception:
+        pass
+    return False
+
+
 # ==========================================
 # MOVIES API
 # ==========================================
@@ -115,6 +140,12 @@ def api_movies_list_create(request):
     elif request.method == "POST":
         try:
             payload = json.loads(request.body.decode("utf-8"))
+            user_id = payload.get("user_id") or payload.get("created_by") or (request.user.id if request.user.is_authenticated else None)
+
+            # Role-Based Control: Only admins can add movies
+            if not is_admin_user(user_id or request.user):
+                return JsonResponse({"error": "Permission denied. Only admins can add movies."}, status=403)
+
             movie = Movie.objects.create(
                 title=payload.get("title", "Untitled"),
                 original_title=payload.get("original_title", ""),
@@ -135,6 +166,7 @@ def api_movies_list_create(request):
                 mood_tags=payload.get("mood_tags", []),
                 featured=payload.get("featured", False),
                 tmdb_id=payload.get("tmdb_id"),
+                created_by_id=user_id if User.objects.filter(id=user_id).exists() else None
             )
 
             genre_ids = payload.get("genres", [])
@@ -143,6 +175,38 @@ def api_movies_list_create(request):
                 movie.genres.set(genres)
 
             return JsonResponse({"success": True, "movie": serialize_movie(movie)}, status=201)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+
+@csrf_exempt
+def api_movie_delete(request, movie_id):
+    """
+    Delete a movie by ID. Only accessible by admins.
+    """
+    if request.method in ["DELETE", "POST"]:
+        try:
+            user_id = None
+            if request.body:
+                try:
+                    payload = json.loads(request.body.decode("utf-8"))
+                    user_id = payload.get("user_id")
+                except Exception:
+                    pass
+
+            # Role-Based Control: Only admins can delete movies
+            if not is_admin_user(user_id or request.user):
+                return JsonResponse({"error": "Permission denied. Only admins can delete movies."}, status=403)
+
+            movie = Movie.objects.filter(id=movie_id).first()
+            if not movie:
+                return JsonResponse({"error": "Movie not found"}, status=404)
+
+            movie_title = movie.title
+            movie.delete()
+            return JsonResponse({"success": True, "message": f'Movie "{movie_title}" deleted successfully'})
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
 
@@ -421,6 +485,8 @@ def api_users_list(request):
             "id": u.id,
             "username": u.username,
             "email": u.email,
+            "is_staff": u.is_staff or u.username.lower() in ["shubh", "shubham", "admin"],
+            "role": "admin" if (u.is_staff or u.is_superuser or u.username.lower() in ["shubh", "shubham", "admin"]) else "user",
             "avatar": f"https://api.dicebear.com/7.x/bottts/svg?seed={u.username}"
         }
         for u in users

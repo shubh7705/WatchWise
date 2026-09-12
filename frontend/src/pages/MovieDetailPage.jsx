@@ -18,7 +18,9 @@ import {
   Tv,
   Eye,
   EyeOff,
-  AlertTriangle
+  AlertTriangle,
+  ShieldAlert,
+  Loader2
 } from 'lucide-react';
 import { useMovies, RATING_LEVELS } from '../context/MovieContext';
 import { useAuth } from '../context/AuthContext';
@@ -34,12 +36,15 @@ export const MovieDetailPage = ({ movieId, onBack, onSelectMovie }) => {
     getMovieReviews,
     getMovieRatingStats,
     deleteReview,
+    deleteMovie,
     openTrailer,
     openAddToPlaylist,
     showToast
   } = useMovies();
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [revealedSpoilers, setRevealedSpoilers] = useState({});
 
   const movie = movies.find(m => m.id === Number(movieId) || String(m.id) === String(movieId));
@@ -80,16 +85,47 @@ export const MovieDetailPage = ({ movieId, onBack, onSelectMovie }) => {
     }
   };
 
+  const handleDeleteMovie = async () => {
+    if (!isAdmin) {
+      showToast('Permission denied. Only admins can delete movies.', 'error');
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      const ok = await deleteMovie(movie.id);
+      if (ok) {
+        setIsDeleteModalOpen(false);
+        onBack();
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="app-container" style={{ paddingBottom: '80px' }}>
       {/* Back Button */}
-      <button
-        onClick={onBack}
-        className="btn btn-ghost btn-sm"
-        style={{ margin: '16px 0 20px', borderRadius: 'var(--radius-full)' }}
-      >
-        <ArrowLeft size={16} /> Back to Movies
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '16px 0 20px' }}>
+        <button
+          onClick={onBack}
+          className="btn btn-ghost btn-sm"
+          style={{ borderRadius: 'var(--radius-full)' }}
+        >
+          <ArrowLeft size={16} /> Back to Movies
+        </button>
+
+        {isAdmin && (
+          <button
+            onClick={() => setIsDeleteModalOpen(true)}
+            className="btn btn-danger btn-sm"
+            style={{ borderRadius: 'var(--radius-full)' }}
+            title="Delete movie from database (Admin Only)"
+          >
+            <Trash2 size={15} />
+            <span>Delete Movie</span>
+          </button>
+        )}
+      </div>
 
       {/* Hero Backdrop & Details Glass Panel */}
       <div
@@ -642,6 +678,80 @@ export const MovieDetailPage = ({ movieId, onBack, onSelectMovie }) => {
         onClose={() => setIsReviewModalOpen(false)}
         existingReview={userReview}
       />
+
+      {/* Delete Movie Confirmation Modal (Admin Only) */}
+      {isDeleteModalOpen && (
+        <div className="modal-overlay" onClick={() => !isDeleting && setIsDeleteModalOpen(false)}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: '480px',
+              padding: '28px',
+              textAlign: 'center',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              background: 'var(--bg-surface-elevated)'
+            }}
+          >
+            <div
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                background: 'rgba(239, 68, 68, 0.15)',
+                color: '#ef4444',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}
+            >
+              <ShieldAlert size={28} />
+            </div>
+
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '8px' }}>
+              Delete Movie?
+            </h3>
+
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.5, marginBottom: '24px' }}>
+              Are you sure you want to permanently delete <strong style={{ color: 'var(--text-primary)' }}>"{movie.title}"</strong> from WatchWise?
+              This will remove all associated reviews and playlist entries.
+            </p>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={isDeleting}
+                className="btn btn-secondary"
+                style={{ minWidth: '110px' }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDeleteMovie}
+                disabled={isDeleting}
+                className="btn btn-danger"
+                style={{ minWidth: '130px' }}
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={16} />
+                    <span>Confirm Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

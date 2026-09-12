@@ -35,6 +35,8 @@ export const api = {
   // Movies & Genres
   getMovies: () => request('/movies/'),
   createMovie: (data) => request('/movies/', { method: 'POST', body: JSON.stringify(data) }),
+  deleteMovie: (movieId, userId) =>
+    request(`/movies/${movieId}/`, { method: 'DELETE', body: JSON.stringify({ user_id: userId }) }),
   getGenres: () => request('/genres/'),
 
   // Reviews

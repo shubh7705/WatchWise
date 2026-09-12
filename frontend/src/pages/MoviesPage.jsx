@@ -7,9 +7,11 @@ import {
   ArrowUpDown,
   Plus,
   SlidersHorizontal,
-  BookmarkCheck
+  BookmarkCheck,
+  RotateCcw
 } from 'lucide-react';
 import { useMovies } from '../context/MovieContext';
+import { useAuth } from '../context/AuthContext';
 import { HeroSpotlight } from '../components/HeroSpotlight';
 import { MovieCard } from '../components/MovieCard';
 
@@ -25,6 +27,7 @@ export const MoviesPage = ({ onSelectMovie, onOpenAddMovie }) => {
     setSortBy,
     getMovieRatingStats
   } = useMovies();
+  const { isAdmin } = useAuth();
 
   // Filter and sort movies
   const filteredMovies = useMemo(() => {
@@ -145,13 +148,16 @@ export const MoviesPage = ({ onSelectMovie, onOpenAddMovie }) => {
               </select>
             </div>
 
-            <button
-              onClick={onOpenAddMovie}
-              className="btn btn-primary btn-sm"
-              style={{ borderRadius: 'var(--radius-full)' }}
-            >
-              <Plus size={16} /> Add Movie
-            </button>
+            {isAdmin && (
+              <button
+                onClick={onOpenAddMovie}
+                className="btn btn-primary btn-sm"
+                style={{ borderRadius: 'var(--radius-full)' }}
+                title="Add Movie to Catalog (Admin Only)"
+              >
+                <Plus size={16} /> Add Movie
+              </button>
+            )}
           </div>
         </div>
 
@@ -229,11 +235,23 @@ export const MoviesPage = ({ onSelectMovie, onOpenAddMovie }) => {
           <Film size={48} color="var(--text-muted)" style={{ opacity: 0.4, marginBottom: '16px' }} />
           <h3 style={{ fontSize: '1.25rem', marginBottom: '8px' }}>No Movies Found</h3>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
-            We couldn't find any titles matching "{searchQuery}".
+            We couldn't find any titles matching "{searchQuery || 'selected filter'}".
           </p>
-          <button onClick={onOpenAddMovie} className="btn btn-primary">
-            <Plus size={16} /> Add "{searchQuery}" with TMDb Autofill
-          </button>
+          {isAdmin ? (
+            <button onClick={onOpenAddMovie} className="btn btn-primary">
+              <Plus size={16} /> Add "{searchQuery}" with TMDb Autofill
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedGenre(null);
+              }}
+              className="btn btn-secondary"
+            >
+              <RotateCcw size={16} /> Clear Filters & View All
+            </button>
+          )}
         </div>
       )}
     </div>
