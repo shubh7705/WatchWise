@@ -1,0 +1,9 @@
+# WatchWise Movies List
+# Format: <Movie Title> <Optional Release Year> (One per line)
+Inception 2010
+The Dark Knight 2008
+Interstellar 2014
+Spider-Man: Across the Spider-Verse 2023
+Oppenheimer 2023
+RRR 2022
+Kantara 2022

@@ -209,7 +209,8 @@ def api_movies_list_create(request):
 
             genre_ids = payload.get("genres", [])
             if genre_ids:
-                genres = Genre.objects.filter(id__in=genre_ids)
+                from django.db.models import Q
+                genres = Genre.objects.filter(Q(id__in=genre_ids) | Q(tmdb_id__in=genre_ids))
                 movie.genres.set(genres)
 
             return JsonResponse({"success": True, "movie": serialize_movie(movie)}, status=201)
