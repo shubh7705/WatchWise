@@ -35,19 +35,56 @@ if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
 # Default configuration
 API_BASE_URL = os.environ.get("WATCHWISE_API_URL", "http://127.0.0.1:8000/api")
 ADMIN_USERNAME = os.environ.get("WATCHWISE_ADMIN_USER", "shubh")
-TMDB_API_KEY = (
-    "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5NmM0ZWFmNmM3ZGNiMTRiMjQ5Njg4NTZkMjVjYmM2OSIsIm5iZiI6MTc2NTc2OTE3Ni4wMDcsInN1YiI6IjY5M2Y3ZmQ4MjJhMDg5ZDY3Njk5OTc2NiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.L3KfPPqnwglsr-alY7hVHxOmAkAGFP13Xu_YUW0vseg"
-)
+
+def get_env_var(key, default=""):
+    """Reads environment variable from system environment or .env file."""
+    try:
+        from decouple import config
+        val = config(key, default=None)
+        if val:
+            return val
+    except Exception:
+        pass
+
+    if key in os.environ:
+        return os.environ[key]
+
+    # Search in root and backend directories for .env
+    search_paths = [
+        os.path.join(os.getcwd(), ".env"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend", ".env"),
+    ]
+    for p in search_paths:
+        if os.path.isfile(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            k, v = line.split("=", 1)
+                            if k.strip() == key:
+                                return v.strip().strip("'\"")
+            except Exception:
+                pass
+    return default
+
+TMDB_API_KEY = get_env_var("TMDB_API_KEY", "")
 
 TMDB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie"
 TMDB_DETAILS_URL = "https://api.themoviedb.org/3/movie"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500"
 TMDB_BACKDROP_BASE = "https://image.tmdb.org/t/p/original"
 
-HEADERS_TMDB = {
-    "accept": "application/json",
-    "Authorization": f"Bearer {TMDB_API_KEY}"
-}
+def get_tmdb_headers():
+    key = get_env_var("TMDB_API_KEY", "")
+    return {
+        "accept": "application/json",
+        "Authorization": f"Bearer {key}"
+    }
+
+HEADERS_TMDB = get_tmdb_headers()
+
 
 # Lazy Django initialization holder
 _DJANGO_INITIALIZED = False
