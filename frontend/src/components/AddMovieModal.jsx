@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Film, Loader2, Image as ImageIcon, Check, ShieldAlert } from 'lucide-react';
+import { X, Sparkles, Film, Loader2, Image as ImageIcon, Check, ShieldAlert, Star, Flame } from 'lucide-react';
 import { useMovies } from '../context/MovieContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,6 +16,13 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
   const [backdrop, setBackdrop] = useState('');
   const [tagline, setTagline] = useState('');
   const [selectedGenres, setSelectedGenres] = useState([1, 17]);
+  const [voteAverage, setVoteAverage] = useState(null);
+  const [voteCount, setVoteCount] = useState(null);
+  const [popularity, setPopularity] = useState(null);
+  const [originalTitle, setOriginalTitle] = useState('');
+  const [originalLanguage, setOriginalLanguage] = useState('');
+  const [trailerUrl, setTrailerUrl] = useState('');
+  const [tmdbId, setTmdbId] = useState(null);
   const [isFetchingTmdb, setIsFetchingTmdb] = useState(false);
 
   const resetForm = () => {
@@ -28,6 +35,13 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
     setBackdrop('');
     setTagline('');
     setSelectedGenres([1, 17]);
+    setVoteAverage(null);
+    setVoteCount(null);
+    setPopularity(null);
+    setOriginalTitle('');
+    setOriginalLanguage('');
+    setTrailerUrl('');
+    setTmdbId(null);
     setIsFetchingTmdb(false);
   };
 
@@ -53,6 +67,13 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
         if (data.backdrop) setBackdrop(data.backdrop);
         if (data.tagline) setTagline(data.tagline);
         if (data.genres && data.genres.length > 0) setSelectedGenres(data.genres);
+        if (data.vote_average !== undefined) setVoteAverage(data.vote_average);
+        if (data.vote_count !== undefined) setVoteCount(data.vote_count);
+        if (data.popularity !== undefined) setPopularity(data.popularity);
+        if (data.original_title) setOriginalTitle(data.original_title);
+        if (data.original_language) setOriginalLanguage(data.original_language);
+        if (data.trailer_url) setTrailerUrl(data.trailer_url);
+        if (data.tmdb_id) setTmdbId(data.tmdb_id);
       }
     } finally {
       setIsFetchingTmdb(false);
@@ -82,21 +103,33 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
     let finalDuration = durationMinutes;
     let finalTagline = tagline;
     let finalGenres = selectedGenres;
-    let tmdbId = null;
+    let finalVoteAverage = voteAverage;
+    let finalVoteCount = voteCount;
+    let finalPopularity = popularity;
+    let finalOriginalTitle = originalTitle;
+    let finalOriginalLanguage = originalLanguage;
+    let finalTrailerUrl = trailerUrl;
+    let finalTmdbId = tmdbId;
 
     // If user didn't manually auto-fetch, fetch TMDb poster & details automatically
-    if (!finalPoster) {
+    if (!finalPoster || finalVoteAverage === null) {
       setIsFetchingTmdb(true);
       try {
         const data = await fetchTmdbMovie(title, releaseYear);
         if (data) {
-          if (data.poster) finalPoster = data.poster;
-          if (data.backdrop) finalBackdrop = data.backdrop;
-          if (!finalOverview && data.overview) finalOverview = data.overview;
-          if (!finalYear && data.release_year) finalYear = data.release_year;
-          if (data.tagline) finalTagline = data.tagline;
-          if (data.tmdb_id) tmdbId = data.tmdb_id;
-          if (data.genres?.length) finalGenres = data.genres;
+          if (data.poster && !finalPoster) finalPoster = data.poster;
+          if (data.backdrop && !finalBackdrop) finalBackdrop = data.backdrop;
+          if (data.overview && !finalOverview) finalOverview = data.overview;
+          if (data.release_year && !finalYear) finalYear = data.release_year;
+          if (data.tagline && !finalTagline) finalTagline = data.tagline;
+          if (data.genres?.length && (!finalGenres || !finalGenres.length)) finalGenres = data.genres;
+          if (data.vote_average !== undefined) finalVoteAverage = data.vote_average;
+          if (data.vote_count !== undefined) finalVoteCount = data.vote_count;
+          if (data.popularity !== undefined) finalPopularity = data.popularity;
+          if (data.original_title) finalOriginalTitle = data.original_title;
+          if (data.original_language) finalOriginalLanguage = data.original_language;
+          if (data.trailer_url) finalTrailerUrl = data.trailer_url;
+          if (data.tmdb_id) finalTmdbId = data.tmdb_id;
         }
       } catch (err) {
         console.warn('TMDb submit fetch error', err);
@@ -107,6 +140,8 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
 
     const newMovie = await addMovie({
       title,
+      original_title: finalOriginalTitle || title,
+      original_language: finalOriginalLanguage || 'en',
       release_year: finalYear || new Date().getFullYear(),
       overview: finalOverview,
       language: finalLanguage,
@@ -115,7 +150,11 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
       backdrop: finalBackdrop,
       tagline: finalTagline,
       genres: finalGenres,
-      tmdb_id: tmdbId
+      vote_average: finalVoteAverage,
+      vote_count: finalVoteCount,
+      popularity: finalPopularity,
+      trailer_url: finalTrailerUrl,
+      tmdb_id: finalTmdbId
     });
 
     if (newMovie) {
@@ -193,6 +232,42 @@ export const AddMovieModal = ({ isOpen, onClose, onMovieAdded }) => {
                 <span>Auto-Fetch</span>
               </button>
             </div>
+
+            {voteAverage !== null && (
+              <div
+                style={{
+                  marginTop: '12px',
+                  padding: '10px 14px',
+                  background: 'var(--bg-surface-elevated)',
+                  borderRadius: 'var(--radius-sm)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                  flexWrap: 'wrap',
+                  fontSize: '0.82rem',
+                  border: '1px solid var(--border-subtle)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#fbbf24', fontWeight: 700 }}>
+                  <Star size={14} fill="#fbbf24" /> TMDb Score: {voteAverage} / 10
+                  <span style={{ color: 'var(--text-muted)', fontWeight: 500, marginLeft: '2px' }}>
+                    ({(voteCount || 0).toLocaleString()} votes)
+                  </span>
+                </div>
+
+                {popularity > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#f87171', fontWeight: 600 }}>
+                    <Flame size={14} fill="#f87171" /> Popularity: {popularity}
+                  </div>
+                )}
+
+                {originalTitle && originalTitle !== title && (
+                  <div style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                    Native: <strong style={{ color: 'var(--primary)' }}>{originalTitle}</strong>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Grid Layout for details & poster preview */}

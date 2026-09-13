@@ -48,6 +48,7 @@ def fetch_movie_data(title, year=None):
         tagline = ""
         trailer_url = "https://www.youtube.com/watch?v=tQ0mzXRk-oI"
 
+        details = {}
         try:
             details_response = requests.get(
                 f"{url_movie_details}/{movie_id}",
@@ -69,7 +70,7 @@ def fetch_movie_data(title, year=None):
         except requests.exceptions.RequestException as e:
             print("Details API failed:", e)
 
-        raw_lang = movie.get("original_language", "en")
+        raw_lang = details.get("original_language") or movie.get("original_language", "en")
         lang_map = {
             "hi": "Hindi",
             "te": "Telugu",
@@ -83,26 +84,31 @@ def fetch_movie_data(title, year=None):
             "fr": "French",
         }
 
+        vote_avg = details.get("vote_average") if details.get("vote_average") is not None else movie.get("vote_average", 0.0)
+        vote_cnt = details.get("vote_count") if details.get("vote_count") is not None else movie.get("vote_count", 0)
+        popularity = details.get("popularity") if details.get("popularity") is not None else movie.get("popularity", 0.0)
+        release_date = details.get("release_date") or movie.get("release_date", "")
+
         return {
             "tmdb_id": movie_id,
-            "title": movie.get("title", ""),
-            "original_title": movie.get("original_title", ""),
+            "title": details.get("title") or movie.get("title", ""),
+            "original_title": details.get("original_title") or movie.get("original_title", ""),
             "original_language": raw_lang,
             "language": lang_map.get(raw_lang, raw_lang.title()),
-            "overview": movie.get("overview", ""),
-            "release_year": int(movie.get("release_date", "")[:4]) if movie.get("release_date") else None,
-            "release_date": movie.get("release_date", ""),
+            "overview": details.get("overview") or movie.get("overview", ""),
+            "release_year": int(release_date[:4]) if release_date and len(release_date) >= 4 else None,
+            "release_date": release_date,
             "duration_minutes": runtime or 135,
-            "vote_average": round(float(movie.get("vote_average", 0.0)), 1),
-            "vote_count": int(movie.get("vote_count", 0)),
-            "popularity": round(float(movie.get("popularity", 0.0)), 1),
+            "vote_average": round(float(vote_avg), 1),
+            "vote_count": int(vote_cnt),
+            "popularity": round(float(popularity), 1),
             "poster": (
-                TMDB_IMAGE_BASE + movie["poster_path"]
-                if movie.get("poster_path") else ""
+                TMDB_IMAGE_BASE + (details.get("poster_path") or movie.get("poster_path", ""))
+                if (details.get("poster_path") or movie.get("poster_path")) else ""
             ),
             "backdrop": (
-                TMDB_BACKDROP_BASE + movie["backdrop_path"]
-                if movie.get("backdrop_path") else ""
+                TMDB_BACKDROP_BASE + (details.get("backdrop_path") or movie.get("backdrop_path", ""))
+                if (details.get("backdrop_path") or movie.get("backdrop_path")) else ""
             ),
             "genre_ids": genre_ids,
             "tagline": tagline,

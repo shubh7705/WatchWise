@@ -399,6 +399,12 @@ export const MovieProvider = ({ children }) => {
       return null;
     }
 
+    const parseNum = (val, fallback = 0.0) => {
+      if (val === undefined || val === null || val === '') return fallback;
+      const n = Number(val);
+      return isNaN(n) ? fallback : n;
+    };
+
     const newMovie = {
       id: Date.now(),
       title: movieData.title.trim(),
@@ -409,9 +415,9 @@ export const MovieProvider = ({ children }) => {
       release_date: movieData.release_date || '',
       language: movieData.language || 'English',
       duration_minutes: Number(movieData.duration_minutes) || 120,
-      vote_average: Number(movieData.vote_average) || 7.5,
-      vote_count: Number(movieData.vote_count) || 150,
-      popularity: Number(movieData.popularity) || 50.0,
+      vote_average: Math.round((parseNum(movieData.vote_average, 0.0) + Number.EPSILON) * 10) / 10,
+      vote_count: Math.round(parseNum(movieData.vote_count, 0)),
+      popularity: Math.round((parseNum(movieData.popularity, 0.0) + Number.EPSILON) * 10) / 10,
       poster: movieData.poster?.trim() || 'https://image.tmdb.org/t/p/w500/yUtaHkL2SDIAZhRApZAyQrAXygn.jpg',
       backdrop: movieData.backdrop?.trim() || movieData.poster?.trim() || 'https://image.tmdb.org/t/p/original/yUtaHkL2SDIAZhRApZAyQrAXygn.jpg',
       genres: movieData.genres || [1],
@@ -498,8 +504,8 @@ export const MovieProvider = ({ children }) => {
         let trailerUrl = '';
         if (detailData.videos && detailData.videos.results) {
           const trailer = detailData.videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube') || detailData.videos.results[0];
-          if (trailer) {
-            trailerUrl = `https://www.youtube.com/watch?v=s${trailer.key}`;
+          if (trailer && trailer.key) {
+            trailerUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
           }
         }
 
@@ -517,6 +523,16 @@ export const MovieProvider = ({ children }) => {
           fr: 'French'
         };
 
+        const rawVoteAvg = detailData.vote_average !== undefined && detailData.vote_average !== null
+          ? detailData.vote_average
+          : (top.vote_average !== undefined && top.vote_average !== null ? top.vote_average : 0.0);
+        const rawVoteCount = detailData.vote_count !== undefined && detailData.vote_count !== null
+          ? detailData.vote_count
+          : (top.vote_count || 0);
+        const rawPopularity = detailData.popularity !== undefined && detailData.popularity !== null
+          ? detailData.popularity
+          : (top.popularity || 0.0);
+
         return {
           title: detailData.title || top.title,
           original_title: detailData.original_title || top.original_title || detailData.title,
@@ -526,10 +542,10 @@ export const MovieProvider = ({ children }) => {
           release_date: detailData.release_date || top.release_date || '',
           language: langMap[rawLang] || rawLang.toUpperCase(),
           duration_minutes: detailData.runtime || 135,
-          vote_average: Math.round(((detailData.vote_average || top.vote_average || 7.5) + Number.EPSILON) * 10) / 10,
-          vote_count: detailData.vote_count || top.vote_count || 120,
-          popularity: Math.round(((detailData.popularity || top.popularity || 45.0) + Number.EPSILON) * 10) / 10,
-          poster: top.poster_path ? `https://image.tmdb.org/t/p/w500${top.poster_path}` : '',
+          vote_average: Math.round((Number(rawVoteAvg) + Number.EPSILON) * 10) / 10,
+          vote_count: Number(rawVoteCount),
+          popularity: Math.round((Number(rawPopularity) + Number.EPSILON) * 10) / 10,
+          poster: (detailData.poster_path || top.poster_path) ? `https://image.tmdb.org/t/p/w500${detailData.poster_path || top.poster_path}` : '',
           backdrop: (detailData.backdrop_path || top.backdrop_path) ? `https://image.tmdb.org/t/p/original${detailData.backdrop_path || top.backdrop_path}` : '',
           genres: detailData.genres ? detailData.genres.map(g => {
             const match = genres.find(item => item.tmdb_id === g.id || item.name.toLowerCase() === g.name.toLowerCase());
