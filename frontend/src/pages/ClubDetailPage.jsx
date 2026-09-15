@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   Users,
@@ -12,7 +13,12 @@ import {
 import { useMovies } from '../context/MovieContext';
 import { useAuth } from '../context/AuthContext';
 
-export const ClubDetailPage = ({ clubId, onBack }) => {
+export const ClubDetailPage = ({ clubId: propClubId, onBack: propOnBack }) => {
+  const { id: paramId } = useParams();
+  const navigate = useNavigate();
+  const clubId = propClubId || paramId;
+  const onBack = propOnBack || (() => navigate('/clubs'));
+
   const { clubs, joinClub, addClubPost, addClubComment, likeClubPost, showToast } = useMovies();
   const { currentUser } = useAuth();
 

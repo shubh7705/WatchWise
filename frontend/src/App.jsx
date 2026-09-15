@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { MovieProvider, useMovies } from './context/MovieContext';
 import { Navbar } from './components/Navbar';
@@ -18,97 +19,103 @@ import { PlaylistsPage } from './pages/PlaylistsPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 
-function MainApp() {
-  const [activeTab, setActiveTab] = useState('movies'); // 'movies', 'movie-detail', 'clubs', 'club-detail', 'profile', 'playlists', 'login', 'signup'
-  const [selectedMovieId, setSelectedMovieId] = useState(null);
-  const [selectedClubId, setSelectedClubId] = useState(null);
-
+function MainLayout() {
+  const navigate = useNavigate();
   const [isAddMovieModalOpen, setIsAddMovieModalOpen] = useState(false);
   const [isCreateClubModalOpen, setIsCreateClubModalOpen] = useState(false);
-
-  const { isMoodModalOpen, setIsMoodModalOpen } = useMovies();
+  const { isMoodModalOpen } = useMovies();
 
   const handleSelectMovie = (movieId) => {
-    setSelectedMovieId(movieId);
-    setActiveTab('movie-detail');
+    navigate(`/movies/${movieId}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSelectClub = (clubId) => {
-    setSelectedClubId(clubId);
-    setActiveTab('club-detail');
+    navigate(`/clubs/${clubId}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Top Glass Navbar */}
-      <Navbar
-        activeTab={activeTab}
-        setActiveTab={(tab) => {
-          setActiveTab(tab);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        onOpenAddMovie={() => setIsAddMovieModalOpen(true)}
-      />
+      <Navbar onOpenAddMovie={() => setIsAddMovieModalOpen(true)} />
 
       {/* Main View Router */}
       <main style={{ flex: 1 }}>
-        {activeTab === 'movies' && (
-          <MoviesPage
-            onSelectMovie={handleSelectMovie}
-            onOpenAddMovie={() => setIsAddMovieModalOpen(true)}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <MoviesPage
+                onSelectMovie={handleSelectMovie}
+                onOpenAddMovie={() => setIsAddMovieModalOpen(true)}
+              />
+            }
           />
-        )}
-
-        {activeTab === 'movie-detail' && (
-          <MovieDetailPage
-            movieId={selectedMovieId}
-            onBack={() => setActiveTab('movies')}
-            onSelectMovie={handleSelectMovie}
+          <Route
+            path="/movies"
+            element={
+              <MoviesPage
+                onSelectMovie={handleSelectMovie}
+                onOpenAddMovie={() => setIsAddMovieModalOpen(true)}
+              />
+            }
           />
-        )}
-
-        {activeTab === 'playlists' && (
-          <PlaylistsPage
-            onSelectMovie={handleSelectMovie}
+          <Route
+            path="/movies/:id"
+            element={
+              <MovieDetailPage
+                onBack={() => navigate('/movies')}
+                onSelectMovie={handleSelectMovie}
+              />
+            }
           />
-        )}
-
-        {activeTab === 'clubs' && (
-          <ClubsPage
-            onSelectClub={handleSelectClub}
-            onOpenCreateClub={() => setIsCreateClubModalOpen(true)}
+          <Route
+            path="/playlists"
+            element={<PlaylistsPage onSelectMovie={handleSelectMovie} />}
           />
-        )}
-
-        {activeTab === 'club-detail' && (
-          <ClubDetailPage
-            clubId={selectedClubId}
-            onBack={() => setActiveTab('clubs')}
+          <Route
+            path="/clubs"
+            element={
+              <ClubsPage
+                onSelectClub={handleSelectClub}
+                onOpenCreateClub={() => setIsCreateClubModalOpen(true)}
+              />
+            }
           />
-        )}
-
-        {activeTab === 'profile' && (
-          <ProfilePage
-            onSelectMovie={handleSelectMovie}
-            onSelectClub={handleSelectClub}
+          <Route
+            path="/clubs/:id"
+            element={<ClubDetailPage onBack={() => navigate('/clubs')} />}
           />
-        )}
-
-        {activeTab === 'login' && (
-          <LoginPage
-            onNavigateToSignup={() => setActiveTab('signup')}
-            onSuccess={() => setActiveTab('movies')}
+          <Route
+            path="/profile"
+            element={
+              <ProfilePage
+                onSelectMovie={handleSelectMovie}
+                onSelectClub={handleSelectClub}
+              />
+            }
           />
-        )}
-
-        {activeTab === 'signup' && (
-          <SignupPage
-            onNavigateToLogin={() => setActiveTab('login')}
-            onSuccess={() => setActiveTab('movies')}
+          <Route
+            path="/login"
+            element={
+              <LoginPage
+                onNavigateToSignup={() => navigate('/signup')}
+                onSuccess={() => navigate('/')}
+              />
+            }
           />
-        )}
+          <Route
+            path="/signup"
+            element={
+              <SignupPage
+                onNavigateToLogin={() => navigate('/login')}
+                onSuccess={() => navigate('/')}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
 
       {/* Global Modals */}
@@ -175,10 +182,12 @@ function MainApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MovieProvider>
-        <MainApp />
-      </MovieProvider>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <MovieProvider>
+          <MainLayout />
+        </MovieProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }

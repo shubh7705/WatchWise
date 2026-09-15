@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Film,
   Users,
@@ -17,10 +18,27 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useMovies } from '../context/MovieContext';
 
-export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
+export const Navbar = ({ onOpenAddMovie }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { currentUser, users, switchUser, logout, isAuthenticated, isAdmin } = useAuth();
   const { theme, toggleTheme, searchQuery, setSearchQuery, setIsMoodModalOpen } = useMovies();
   const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const currentTab = (() => {
+    const p = location.pathname;
+    if (p.startsWith('/clubs')) return 'clubs';
+    if (p.startsWith('/playlists')) return 'playlists';
+    if (p.startsWith('/profile')) return 'profile';
+    if (p === '/login') return 'login';
+    if (p === '/signup') return 'signup';
+    return 'movies';
+  })();
+
+  const handleNavigate = (path) => {
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <header
@@ -47,7 +65,7 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
       >
         {/* Brand Logo */}
         <div
-          onClick={() => setActiveTab('movies')}
+          onClick={() => handleNavigate('/')}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -57,6 +75,7 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
             flexShrink: 0
           }}
         >
+
           <div
             style={{
               width: '42px',
@@ -116,7 +135,9 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
-              if (activeTab !== 'movies') setActiveTab('movies');
+              if (location.pathname !== '/' && location.pathname !== '/movies') {
+                handleNavigate('/movies');
+              }
             }}
             className="input-modern"
             style={{
@@ -139,8 +160,8 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
           }}
         >
           <button
-            onClick={() => setActiveTab('movies')}
-            className={`btn btn-sm ${activeTab === 'movies' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => handleNavigate('/movies')}
+            className={`btn btn-sm ${currentTab === 'movies' ? 'btn-primary' : 'btn-ghost'}`}
             style={{ borderRadius: 'var(--radius-full)' }}
           >
             <Film size={16} />
@@ -163,8 +184,8 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
           </button>
 
           <button
-            onClick={() => setActiveTab('playlists')}
-            className={`btn btn-sm ${activeTab === 'playlists' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => handleNavigate('/playlists')}
+            className={`btn btn-sm ${currentTab === 'playlists' ? 'btn-primary' : 'btn-ghost'}`}
             style={{ borderRadius: 'var(--radius-full)' }}
           >
             <ListPlus size={16} />
@@ -172,8 +193,8 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
           </button>
 
           <button
-            onClick={() => setActiveTab('clubs')}
-            className={`btn btn-sm ${activeTab === 'clubs' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => handleNavigate('/clubs')}
+            className={`btn btn-sm ${currentTab === 'clubs' ? 'btn-primary' : 'btn-ghost'}`}
             style={{ borderRadius: 'var(--radius-full)' }}
           >
             <Users size={16} />
@@ -182,8 +203,8 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
 
           {isAuthenticated && (
             <button
-              onClick={() => setActiveTab('profile')}
-              className={`btn btn-sm ${activeTab === 'profile' ? 'btn-primary' : 'btn-ghost'}`}
+              onClick={() => handleNavigate('/profile')}
+              className={`btn btn-sm ${currentTab === 'profile' ? 'btn-primary' : 'btn-ghost'}`}
               style={{ borderRadius: 'var(--radius-full)' }}
             >
               <BookmarkCheck size={16} />
@@ -311,7 +332,7 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
 
                     <button
                       onClick={() => {
-                        setActiveTab('profile');
+                        handleNavigate('/profile');
                         setShowUserMenu(false);
                       }}
                       className="btn btn-ghost"
@@ -389,7 +410,7 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenAddMovie }) => {
             ) : (
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
-                  onClick={() => setActiveTab('login')}
+                  onClick={() => handleNavigate('/login')}
                   className="btn btn-primary btn-sm"
                   style={{ borderRadius: 'var(--radius-full)' }}
                 >

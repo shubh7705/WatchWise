@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   Star,
@@ -27,7 +28,16 @@ import { useAuth } from '../context/AuthContext';
 import { ReviewModal } from '../components/ReviewModal';
 import { MovieCard } from '../components/MovieCard';
 
-export const MovieDetailPage = ({ movieId, onBack, onSelectMovie }) => {
+export const MovieDetailPage = ({ movieId: propMovieId, onBack: propOnBack, onSelectMovie: propOnSelectMovie }) => {
+  const { id: paramId } = useParams();
+  const navigate = useNavigate();
+  const movieId = propMovieId || paramId;
+  const onBack = propOnBack || (() => navigate('/movies'));
+  const onSelectMovie = propOnSelectMovie || ((id) => {
+    navigate(`/movies/${id}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
   const {
     movies,
     genres,
