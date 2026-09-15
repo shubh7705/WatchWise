@@ -91,6 +91,15 @@ npm run dev
 ```
 Open **`http://localhost:5173`** in your browser.
 
+### 3. Run with Docker (Full-Stack Containerized) 🐳
+
+```bash
+# Build and launch both backend and frontend containers
+docker compose up --build
+```
+- Frontend UI: **`http://localhost:5173`** or **`http://localhost:80`**
+- Backend REST API: **`http://localhost:8000/`**
+
 ## 🌐 Live Demo
 
 https://watchwise-k07t.onrender.com/movies/
