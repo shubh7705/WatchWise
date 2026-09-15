@@ -117,9 +117,9 @@ export const MovieProvider = ({ children }) => {
 
   // Modals & Overlay state
   const [activeTrailer, setActiveTrailer] = useState(null); // { title, url }
-  const [isMoodModalOpen, setIsMoodModalOpen] = useState(false);
   const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
   const [playlistTargetMovie, setPlaylistTargetMovie] = useState(null);
+
 
   useEffect(() => {
     localStorage.setItem('watchwise_movies_v2', JSON.stringify(movies));
@@ -746,8 +746,6 @@ export const MovieProvider = ({ children }) => {
       activeTrailer,
       openTrailer,
       closeTrailer,
-      isMoodModalOpen,
-      setIsMoodModalOpen,
       isPlaylistModalOpen,
       setIsPlaylistModalOpen,
       playlistTargetMovie,

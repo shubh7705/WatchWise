@@ -12,7 +12,7 @@ WatchWise is a full-stack movie discovery, review, and community platform featur
 
 * Browse and explore movies with live TMDb search & auto-fill
 * Add reviews and ratings with spoiler warnings
-* Personalized movie recommendations & Mood Matcher / Vibe Roulette
+* Personalized movie recommendations tailored to your watch history
 * Community discussion forums & movie clubs
 * User authentication, user profiles & Role-Based Access Control (Admin-only movie management)
 * Light and Dark cinema themes

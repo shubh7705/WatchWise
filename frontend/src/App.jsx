@@ -7,7 +7,6 @@ import { Toast } from './components/Toast';
 import { AddMovieModal } from './components/AddMovieModal';
 import { CreateClubModal } from './components/CreateClubModal';
 import { TrailerModal } from './components/TrailerModal';
-import { MoodRouletteModal } from './components/MoodRouletteModal';
 import { AddToPlaylistModal } from './components/AddToPlaylistModal';
 
 import { HomePage } from './pages/HomePage';
@@ -24,7 +23,7 @@ function MainLayout() {
   const navigate = useNavigate();
   const [isAddMovieModalOpen, setIsAddMovieModalOpen] = useState(false);
   const [isCreateClubModalOpen, setIsCreateClubModalOpen] = useState(false);
-  const { isMoodModalOpen } = useMovies();
+
 
   const handleSelectMovie = (movieId) => {
     navigate(`/movies/${movieId}`);
@@ -152,12 +151,6 @@ function MainLayout() {
       />
 
       <TrailerModal />
-
-      <MoodRouletteModal
-        isOpen={isMoodModalOpen}
-        onClose={() => setIsMoodModalOpen(false)}
-        onSelectMovie={handleSelectMovie}
-      />
 
       <AddToPlaylistModal />
 

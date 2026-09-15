@@ -14,7 +14,6 @@ import {
   LogOut,
   ChevronDown,
   Sparkles,
-  Dices,
   ListPlus
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -24,8 +23,9 @@ export const Navbar = ({ onOpenAddMovie }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, users, switchUser, logout, isAuthenticated, isAdmin } = useAuth();
-  const { theme, toggleTheme, searchQuery, setSearchQuery, setIsMoodModalOpen } = useMovies();
+  const { theme, toggleTheme, searchQuery, setSearchQuery } = useMovies();
   const [showUserMenu, setShowUserMenu] = useState(false);
+
 
   const currentTab = (() => {
     const p = location.pathname;
@@ -180,21 +180,6 @@ export const Navbar = ({ onOpenAddMovie }) => {
           >
             <Compass size={16} />
             <span>Explore</span>
-          </button>
-
-          <button
-            onClick={() => setIsMoodModalOpen(true)}
-            className="btn btn-sm btn-secondary"
-            style={{
-              borderRadius: 'var(--radius-full)',
-              borderColor: 'rgba(168, 85, 247, 0.4)',
-              color: '#c084fc',
-              background: 'rgba(168, 85, 247, 0.1)'
-            }}
-            title="AI Mood Recommender & Watch Roulette Wheel"
-          >
-            <Dices size={16} />
-            <span>Vibe & Roulette</span>
           </button>
 
           <button

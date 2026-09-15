@@ -6,7 +6,6 @@ import {
   Star,
   Film,
   Compass,
-  Dices,
   BookmarkCheck,
   History,
   TrendingUp,
@@ -21,8 +20,9 @@ import { MovieCard } from '../components/MovieCard';
 
 export const HomePage = ({ onSelectMovie }) => {
   const navigate = useNavigate();
-  const { movies, genres, watchHistory, isWatched, getMovieRatingStats, setIsMoodModalOpen } = useMovies();
+  const { movies, genres, watchHistory, isWatched, getMovieRatingStats } = useMovies();
   const { currentUser, isAuthenticated } = useAuth();
+
 
   // Get list of watched movie objects for the current user
   const watchedMovieIds = useMemo(() => {
@@ -157,19 +157,6 @@ export const HomePage = ({ onSelectMovie }) => {
         </div>
 
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => setIsMoodModalOpen(true)}
-            className="btn btn-secondary"
-            style={{
-              borderColor: 'rgba(168, 85, 247, 0.4)',
-              color: '#c084fc',
-              background: 'rgba(168, 85, 247, 0.12)'
-            }}
-          >
-            <Dices size={17} />
-            <span>Spin Roulette</span>
-          </button>
-
           <button
             onClick={() => navigate('/explore')}
             className="btn btn-primary"
