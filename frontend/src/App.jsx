@@ -10,6 +10,7 @@ import { TrailerModal } from './components/TrailerModal';
 import { MoodRouletteModal } from './components/MoodRouletteModal';
 import { AddToPlaylistModal } from './components/AddToPlaylistModal';
 
+import { HomePage } from './pages/HomePage';
 import { MoviesPage } from './pages/MoviesPage';
 import { MovieDetailPage } from './pages/MovieDetailPage';
 import { ClubsPage } from './pages/ClubsPage';
@@ -37,14 +38,21 @@ function MainLayout() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Top Glass Navbar */}
+      {/* Top Glass Navbar with separate Home and Explore tabs */}
       <Navbar onOpenAddMovie={() => setIsAddMovieModalOpen(true)} />
 
       {/* Main View Router */}
       <main style={{ flex: 1 }}>
         <Routes>
+          {/* Frontpage: Personalized recommendations & watch stream */}
           <Route
             path="/"
+            element={<HomePage onSelectMovie={handleSelectMovie} />}
+          />
+
+          {/* Explore: Full searchable & filterable movie catalog */}
+          <Route
+            path="/explore"
             element={
               <MoviesPage
                 onSelectMovie={handleSelectMovie}
@@ -61,19 +69,25 @@ function MainLayout() {
               />
             }
           />
+
+          {/* Movie Details */}
           <Route
             path="/movies/:id"
             element={
               <MovieDetailPage
-                onBack={() => navigate('/movies')}
+                onBack={() => navigate('/explore')}
                 onSelectMovie={handleSelectMovie}
               />
             }
           />
+
+          {/* Playlists */}
           <Route
             path="/playlists"
             element={<PlaylistsPage onSelectMovie={handleSelectMovie} />}
           />
+
+          {/* Clubs */}
           <Route
             path="/clubs"
             element={
@@ -87,6 +101,8 @@ function MainLayout() {
             path="/clubs/:id"
             element={<ClubDetailPage onBack={() => navigate('/clubs')} />}
           />
+
+          {/* Profile & Watchlist */}
           <Route
             path="/profile"
             element={
@@ -96,6 +112,8 @@ function MainLayout() {
               />
             }
           />
+
+          {/* Auth */}
           <Route
             path="/login"
             element={
@@ -114,6 +132,8 @@ function MainLayout() {
               />
             }
           />
+
+          {/* Catch-all redirect to Home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

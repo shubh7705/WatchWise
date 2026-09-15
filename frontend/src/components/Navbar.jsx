@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
+  Home,
+  Compass,
   Film,
   Users,
   BookmarkCheck,
@@ -27,12 +29,14 @@ export const Navbar = ({ onOpenAddMovie }) => {
 
   const currentTab = (() => {
     const p = location.pathname;
+    if (p === '/' || p === '/home') return 'home';
+    if (p.startsWith('/explore') || p.startsWith('/movies')) return 'explore';
     if (p.startsWith('/clubs')) return 'clubs';
     if (p.startsWith('/playlists')) return 'playlists';
     if (p.startsWith('/profile')) return 'profile';
     if (p === '/login') return 'login';
     if (p === '/signup') return 'signup';
-    return 'movies';
+    return 'home';
   })();
 
   const handleNavigate = (path) => {
@@ -75,7 +79,6 @@ export const Navbar = ({ onOpenAddMovie }) => {
             flexShrink: 0
           }}
         >
-
           <div
             style={{
               width: '42px',
@@ -135,8 +138,8 @@ export const Navbar = ({ onOpenAddMovie }) => {
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
-              if (location.pathname !== '/' && location.pathname !== '/movies') {
-                handleNavigate('/movies');
+              if (!location.pathname.startsWith('/explore') && !location.pathname.startsWith('/movies')) {
+                handleNavigate('/explore');
               }
             }}
             className="input-modern"
@@ -160,11 +163,22 @@ export const Navbar = ({ onOpenAddMovie }) => {
           }}
         >
           <button
-            onClick={() => handleNavigate('/movies')}
-            className={`btn btn-sm ${currentTab === 'movies' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => handleNavigate('/')}
+            className={`btn btn-sm ${currentTab === 'home' ? 'btn-primary' : 'btn-ghost'}`}
             style={{ borderRadius: 'var(--radius-full)' }}
+            title="Personalized Recommendations & Watch History Stream"
           >
-            <Film size={16} />
+            <Sparkles size={16} />
+            <span>Home</span>
+          </button>
+
+          <button
+            onClick={() => handleNavigate('/explore')}
+            className={`btn btn-sm ${currentTab === 'explore' ? 'btn-primary' : 'btn-ghost'}`}
+            style={{ borderRadius: 'var(--radius-full)' }}
+            title="Full Catalog with Filters, Search & Sorting"
+          >
+            <Compass size={16} />
             <span>Explore</span>
           </button>
 
