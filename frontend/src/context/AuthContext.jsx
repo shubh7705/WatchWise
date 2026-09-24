@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { initialUsers } from '../data/initialData';
+import { api } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -45,8 +46,7 @@ export const AuthProvider = ({ children }) => {
 
   // Sync users from backend API
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/auth/users/')
-      .then(res => res.ok ? res.json() : null)
+    api.getUsers()
       .then(data => {
         if (data?.users?.length) {
           setUsers(prev => {
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
           });
         }
       })
-      .catch(err => console.info('Backend users load info:', err.message));
+      .catch(err => console.info('Backend users load info:', err?.message));
   }, []);
 
   useEffect(() => {
