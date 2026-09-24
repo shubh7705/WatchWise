@@ -341,55 +341,6 @@ export const Navbar = ({ onOpenAddMovie }) => {
                       <span>My Profile & History</span>
                     </button>
 
-                    {/* Switch Demo User Section */}
-                    <div style={{ margin: '10px 0 6px', padding: '4px 10px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                      <Sparkles size={12} style={{ display: 'inline', marginRight: '4px' }} /> Quick Switch User
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '150px', overflowY: 'auto' }}>
-                      {users.map(u => {
-                        const isUserAdmin = u.role === 'admin' || u.is_staff || ['shubh', 'shubham', 'admin'].includes(u.username.toLowerCase());
-                        return (
-                          <button
-                            key={u.id}
-                            onClick={() => {
-                              switchUser(u.id);
-                              setShowUserMenu(false);
-                            }}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px',
-                              padding: '6px 10px',
-                              background: u.id === currentUser.id ? 'var(--bg-surface)' : 'transparent',
-                              borderRadius: 'var(--radius-sm)',
-                              border: u.id === currentUser.id ? '1px solid var(--border-focus)' : 'none',
-                              color: u.id === currentUser.id ? 'var(--primary)' : 'var(--text-secondary)',
-                              cursor: 'pointer',
-                              fontSize: '0.85rem',
-                              fontWeight: 500
-                            }}
-                          >
-                            <img src={u.avatar} alt={u.username} style={{ width: '20px', height: '20px', borderRadius: '50%' }} />
-                            <span>{u.username}</span>
-                            <span
-                              style={{
-                                marginLeft: 'auto',
-                                fontSize: '0.68rem',
-                                padding: '1px 5px',
-                                borderRadius: '4px',
-                                background: isUserAdmin ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                                color: isUserAdmin ? 'var(--primary)' : 'var(--text-muted)'
-                              }}
-                            >
-                              {isUserAdmin ? 'Admin' : 'User'}
-                            </span>
-                            {u.id === currentUser.id && <span style={{ fontSize: '0.7rem', color: 'var(--primary)' }}>✓</span>}
-                          </button>
-                        );
-                      })}
-                    </div>
-
                     <hr style={{ border: 'none', borderTop: '1px solid var(--border-subtle)', margin: '8px 0' }} />
 
                     <button

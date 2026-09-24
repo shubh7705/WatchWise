@@ -23,25 +23,23 @@ export const AuthProvider = ({ children }) => {
     return initialUsers;
   });
 
-  // Current logged in user (defaults to shubh for effortless instant access)
+  // Current logged in user (null by default unless logged in or stored in session)
   const [currentUser, setCurrentUser] = useState(() => {
     const savedCurrent = localStorage.getItem('watchwise_current_user');
     if (savedCurrent) {
       try {
         const parsed = JSON.parse(savedCurrent);
-        const isKnownAdmin = ['shubh', 'shubham', 'admin'].includes(parsed.username?.toLowerCase());
-        const match = initialUsers.find(u => u.username.toLowerCase() === parsed.username.toLowerCase());
+        const isKnownAdmin = ['shubh', 'shubham', 'admin'].includes(parsed.username?.toLowerCase()) || Boolean(parsed.is_staff);
         return {
           ...parsed,
-          id: match ? match.id : parsed.id,
           role: isKnownAdmin ? 'admin' : (parsed.role || 'user'),
-          is_staff: isKnownAdmin ? true : Boolean(parsed.is_staff)
+          is_staff: isKnownAdmin
         };
       } catch (e) {
         console.error(e);
       }
     }
-    return initialUsers.find(u => u.username === 'shubh') || initialUsers[0];
+    return null;
   });
 
   // Sync users from backend API
@@ -104,17 +102,16 @@ export const AuthProvider = ({ children }) => {
     );
     if (user) {
       // Ensure admin flag on known accounts
-      const isKnownAdmin = ['shubh', 'shubham', 'admin'].includes(user.username.toLowerCase());
+      const isKnownAdmin = ['shubh', 'shubham', 'admin'].includes(user.username.toLowerCase()) || Boolean(user.is_staff);
       const effectiveUser = {
         ...user,
         role: isKnownAdmin ? 'admin' : (user.role || 'user'),
-        is_staff: isKnownAdmin ? true : Boolean(user.is_staff)
+        is_staff: isKnownAdmin
       };
       setCurrentUser(effectiveUser);
       return { success: true, user: effectiveUser };
     }
-    // If user doesn't exist, create on the fly or reject
-    return { success: false, message: 'Invalid credentials. You can select one of the demo accounts below.' };
+    return { success: false, message: 'Invalid username or password.' };
   };
 
   const switchUser = (userId) => {

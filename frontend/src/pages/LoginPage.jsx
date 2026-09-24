@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Film, Lock, User, Sparkles, ArrowRight } from 'lucide-react';
+import { Film, Lock, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const LoginPage = ({ onNavigateToSignup, onSuccess }) => {
-  const { login, users, switchUser } = useAuth();
-  const [username, setUsername] = useState('shubh');
-  const [password, setPassword] = useState('password123');
+  const { login } = useAuth();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
@@ -17,11 +17,6 @@ export const LoginPage = ({ onNavigateToSignup, onSuccess }) => {
     } else {
       setError(result.message);
     }
-  };
-
-  const handleDemoClick = (userId) => {
-    switchUser(userId);
-    onSuccess();
   };
 
   return (
@@ -73,6 +68,7 @@ export const LoginPage = ({ onNavigateToSignup, onSuccess }) => {
               <User size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="text"
+                placeholder="Enter username or email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="input-modern"
@@ -90,6 +86,7 @@ export const LoginPage = ({ onNavigateToSignup, onSuccess }) => {
               <Lock size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="input-modern"
@@ -103,27 +100,6 @@ export const LoginPage = ({ onNavigateToSignup, onSuccess }) => {
             Sign In
           </button>
         </form>
-
-        {/* 1-Click Instant Demo Accounts */}
-        <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '20px', marginBottom: '20px' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--primary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Sparkles size={14} /> Or 1-Click Instant Demo Login:
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-            {users.slice(0, 4).map(u => (
-              <button
-                key={u.id}
-                type="button"
-                onClick={() => handleDemoClick(u.id)}
-                className="btn btn-secondary btn-sm"
-                style={{ justifyContent: 'flex-start', padding: '6px 10px', fontSize: '0.8rem' }}
-              >
-                <img src={u.avatar} alt={u.username} style={{ width: '18px', height: '18px', borderRadius: '50%' }} />
-                <span>{u.username}</span>
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Switch to Signup */}
         <div style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
