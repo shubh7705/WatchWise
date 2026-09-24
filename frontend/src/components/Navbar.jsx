@@ -172,43 +172,45 @@ export const Navbar = ({ onOpenAddMovie }) => {
             <span>Home</span>
           </button>
 
-          <button
-            onClick={() => handleNavigate('/explore')}
-            className={`btn btn-sm ${currentTab === 'explore' ? 'btn-primary' : 'btn-ghost'}`}
-            style={{ borderRadius: 'var(--radius-full)' }}
-            title="Full Catalog with Filters, Search & Sorting"
-          >
-            <Compass size={16} />
-            <span>Explore</span>
-          </button>
-
-          <button
-            onClick={() => handleNavigate('/playlists')}
-            className={`btn btn-sm ${currentTab === 'playlists' ? 'btn-primary' : 'btn-ghost'}`}
-            style={{ borderRadius: 'var(--radius-full)' }}
-          >
-            <ListPlus size={16} />
-            <span>Playlists</span>
-          </button>
-
-          <button
-            onClick={() => handleNavigate('/clubs')}
-            className={`btn btn-sm ${currentTab === 'clubs' ? 'btn-primary' : 'btn-ghost'}`}
-            style={{ borderRadius: 'var(--radius-full)' }}
-          >
-            <Users size={16} />
-            <span>Clubs</span>
-          </button>
-
           {isAuthenticated && (
-            <button
-              onClick={() => handleNavigate('/profile')}
-              className={`btn btn-sm ${currentTab === 'profile' ? 'btn-primary' : 'btn-ghost'}`}
-              style={{ borderRadius: 'var(--radius-full)' }}
-            >
-              <BookmarkCheck size={16} />
-              <span>Watchlist</span>
-            </button>
+            <>
+              <button
+                onClick={() => handleNavigate('/explore')}
+                className={`btn btn-sm ${currentTab === 'explore' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ borderRadius: 'var(--radius-full)' }}
+                title="Full Catalog with Filters, Search & Sorting"
+              >
+                <Compass size={16} />
+                <span>Explore</span>
+              </button>
+
+              <button
+                onClick={() => handleNavigate('/playlists')}
+                className={`btn btn-sm ${currentTab === 'playlists' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ borderRadius: 'var(--radius-full)' }}
+              >
+                <ListPlus size={16} />
+                <span>Playlists</span>
+              </button>
+
+              <button
+                onClick={() => handleNavigate('/clubs')}
+                className={`btn btn-sm ${currentTab === 'clubs' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ borderRadius: 'var(--radius-full)' }}
+              >
+                <Users size={16} />
+                <span>Clubs</span>
+              </button>
+
+              <button
+                onClick={() => handleNavigate('/profile')}
+                className={`btn btn-sm ${currentTab === 'profile' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ borderRadius: 'var(--radius-full)' }}
+              >
+                <BookmarkCheck size={16} />
+                <span>Watchlist</span>
+              </button>
+            </>
           )}
 
           {isAdmin && (

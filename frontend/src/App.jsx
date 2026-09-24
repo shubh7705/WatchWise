@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { MovieProvider, useMovies } from './context/MovieContext';
 import { Navbar } from './components/Navbar';
 import { Toast } from './components/Toast';
@@ -18,6 +18,14 @@ import { ProfilePage } from './pages/ProfilePage';
 import { PlaylistsPage } from './pages/PlaylistsPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
+
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
 function MainLayout() {
   const navigate = useNavigate();
@@ -43,72 +51,88 @@ function MainLayout() {
       {/* Main View Router */}
       <main style={{ flex: 1 }}>
         <Routes>
-          {/* Frontpage: Personalized recommendations & watch stream */}
+          {/* Frontpage: Personalized recommendations & watch stream (Public) */}
           <Route
             path="/"
             element={<HomePage onSelectMovie={handleSelectMovie} />}
           />
 
-          {/* Explore: Full searchable & filterable movie catalog */}
+          {/* Movie Details (Public) */}
+          <Route
+            path="/movies/:id"
+            element={
+              <MovieDetailPage
+                onBack={() => navigate('/')}
+                onSelectMovie={handleSelectMovie}
+              />
+            }
+          />
+
+          {/* Explore: Full searchable & filterable movie catalog (Protected) */}
           <Route
             path="/explore"
             element={
-              <MoviesPage
-                onSelectMovie={handleSelectMovie}
-                onOpenAddMovie={() => setIsAddMovieModalOpen(true)}
-              />
+              <ProtectedRoute>
+                <MoviesPage
+                  onSelectMovie={handleSelectMovie}
+                  onOpenAddMovie={() => setIsAddMovieModalOpen(true)}
+                />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/movies"
             element={
-              <MoviesPage
-                onSelectMovie={handleSelectMovie}
-                onOpenAddMovie={() => setIsAddMovieModalOpen(true)}
-              />
+              <ProtectedRoute>
+                <MoviesPage
+                  onSelectMovie={handleSelectMovie}
+                  onOpenAddMovie={() => setIsAddMovieModalOpen(true)}
+                />
+              </ProtectedRoute>
             }
           />
 
-          {/* Movie Details */}
-          <Route
-            path="/movies/:id"
-            element={
-              <MovieDetailPage
-                onBack={() => navigate('/explore')}
-                onSelectMovie={handleSelectMovie}
-              />
-            }
-          />
-
-          {/* Playlists */}
+          {/* Playlists (Protected) */}
           <Route
             path="/playlists"
-            element={<PlaylistsPage onSelectMovie={handleSelectMovie} />}
+            element={
+              <ProtectedRoute>
+                <PlaylistsPage onSelectMovie={handleSelectMovie} />
+              </ProtectedRoute>
+            }
           />
 
-          {/* Clubs */}
+          {/* Clubs (Protected) */}
           <Route
             path="/clubs"
             element={
-              <ClubsPage
-                onSelectClub={handleSelectClub}
-                onOpenCreateClub={() => setIsCreateClubModalOpen(true)}
-              />
+              <ProtectedRoute>
+                <ClubsPage
+                  onSelectClub={handleSelectClub}
+                  onOpenCreateClub={() => setIsCreateClubModalOpen(true)}
+                />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/clubs/:id"
-            element={<ClubDetailPage onBack={() => navigate('/clubs')} />}
+            element={
+              <ProtectedRoute>
+                <ClubDetailPage onBack={() => navigate('/clubs')} />
+              </ProtectedRoute>
+            }
           />
 
-          {/* Profile & Watchlist */}
+          {/* Profile & Watchlist (Protected) */}
           <Route
             path="/profile"
             element={
-              <ProfilePage
-                onSelectMovie={handleSelectMovie}
-                onSelectClub={handleSelectClub}
-              />
+              <ProtectedRoute>
+                <ProfilePage
+                  onSelectMovie={handleSelectMovie}
+                  onSelectClub={handleSelectClub}
+                />
+              </ProtectedRoute>
             }
           />
 
